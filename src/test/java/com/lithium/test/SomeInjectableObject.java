@@ -1,11 +1,12 @@
 package com.lithium.test;
 
 import com.lithium.inject.Inject;
+import com.lithium.inject.InjectableObject;
 
-public class SomeObject {
+public class SomeInjectableObject extends InjectableObject{
 	
 	@Inject
-	private static SingletonDependency singletonStatic;
+	private static MultipleDependency mulitpleStatic;
 	
 	@Inject
 	private SingletonDependency singletonField;
@@ -14,8 +15,8 @@ public class SomeObject {
 	private MultipleDependency multipleField;
 	
 	
-	public static SingletonDependency singletonStaticInjectionTest(){
-		return singletonStatic;
+	public static MultipleDependency mulitpleStaticInjectionTest(){
+		return mulitpleStatic;
 	}
 
 	public SingletonDependency singletonFieldTest() {
@@ -25,5 +26,4 @@ public class SomeObject {
 	public MultipleDependency multipleFieldTest() {
 		return multipleField;
 	}
-	
 }

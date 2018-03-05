@@ -1,44 +1,98 @@
 package com.lithium.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.lithium.dependency.InstanceType;
-import com.lithium.inject.Inject;
 import com.lithium.inject.Injector;
 
 public class DependencyInjectionTest {
-	
-	@Inject
-	private static SomeObject s;
-	
-	@Inject
-	private static AnotherObject a;
 
 	public static void main(String[] args) {
-		Injector i = Injector.getInstance();
+		Injector injector = Injector.getInstance();
 		
-		System.out.println("SomeObject: " + s.test);
+		int passed = 0;
 		
-		System.out.println("AnotherObject: " + a.test);
+		// Static tests
 		
-		System.out.println("YetAnother Object: " + new YetAnotherObject(9).test);
+		SingletonDependency s1 = SomeObject.singletonStaticInjectionTest();
+		String result = testSingletonDependency(s1);
+		System.out.println("Test 1:\t\t" + result);
+		if(testPassed(result)) passed++;
 		
-		i.registerDependency(ArrayList.class, InstanceType.MULTIPLE);
+		MultipleDependency m1 = SomeInjectableObject.mulitpleStaticInjectionTest();
+		result = testMultipleDependency(m1, 1);
+		System.out.println("Test 2:\t\t" + result);
+		if(testPassed(result)) passed++;
 		
-		List<?> list = i.getDependency(List.class);
-		System.out.println(list.getClass());
+		// Manually injected tests
 		
-		/*AnotherObject a = i.getDependency(AnotherObject.class);
-		System.out.println("Original a value: " + a.test);
+		SomeObject so = new SomeObject();
+		injector.injectDependencies(so);
 		
-		SomeObject b = i.getDependency(SomeObject.class);
-		System.out.println("b value before a value changed (expected 50) " + b.test);
+		SingletonDependency s2 = so.singletonFieldTest();
+		result = testSingletonDependency(s2);
+		System.out.println("Test 3:\t\t" + result);
+		if(testPassed(result)) passed++;
 		
-		a.setTestInt(80);
+		MultipleDependency m2 = so.multipleFieldTest();
+		result = testMultipleDependency(m2, 2);
+		System.out.println("Test 4:\t\t" + result);
+		if(testPassed(result)) passed++;
 		
-		SomeObject c = i.getDependency(SomeObject.class);
-		System.out.println("c value after a value changed (expected 800) " + c.test);*/
+		// Extended tests
+		
+		SomeInjectableObject sio = new SomeInjectableObject();
+		
+		SingletonDependency s3 = sio.singletonFieldTest();
+		result = testSingletonDependency(s3);
+		System.out.println("Test 5:\t\t" + result);
+		if(testPassed(result)) passed++;
+		
+		MultipleDependency m3 = sio.multipleFieldTest();
+		result = testMultipleDependency(m3, 3);
+		System.out.println("Test 6:\t\t" + result);
+		if(testPassed(result)) passed++;
+		
+		// Dependency with dependency tests
+		
+		DependencyWithDependencies d = injector.getDependency(DependencyWithDependencies.class);
+		
+		SingletonDependency s4 = d.singletonFieldTest();
+		result = testSingletonDependency(s4);
+		System.out.println("Test 7:\t\t" + result);
+		if(testPassed(result)) passed++;
+		
+		MultipleDependency m4 = d.multipleFieldTest();
+		result = testMultipleDependency(m4, 4);
+		System.out.println("Test 8:\t\t" + result);
+		if(testPassed(result)) passed++;
+		
+		SingletonDependency s5 = d.singletonConstructorTest();
+		result = testSingletonDependency(s5);
+		System.out.println("Test 9:\t\t" + result);
+		if(testPassed(result)) passed++;
+		
+		MultipleDependency m5 = d.multipleConstructorTest();
+		result = testMultipleDependency(m5, 5);
+		System.out.println("Test 10:\t" + result);
+		if(testPassed(result)) passed++;
+		
+		// Test final results
+		
+		System.out.println("Tests passed : " + passed + "/10");
+	}
+	
+	public static String testSingletonDependency(SingletonDependency dependency){
+		if(dependency == null) return "FAILED: Dependency not injected";
+		else if(dependency.getInstance() != 1) return "FAILED: Multiple instances of singleton exist.Instance: " + dependency.getInstance();
+		else return "PASSED";
+	}
+	
+	public static String testMultipleDependency(MultipleDependency dependency, int expectedInstance){
+		if(dependency == null) return "FAILED: Dependency not injected";
+		else if(dependency.getInstance() != expectedInstance) return "FAILED: Unexpected dependency instance. Instance: " + dependency.getInstance();
+		else return "PASSED";
+	}
+	
+	public static boolean testPassed(String testDesc){
+		return testDesc.contains("PASSED");
 	}
 
 }
