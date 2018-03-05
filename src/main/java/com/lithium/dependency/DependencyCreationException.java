@@ -1,4 +1,4 @@
-package com.iw.dependency;
+package com.lithium.dependency;
 
 /**
  * An exception to be thrown if errors

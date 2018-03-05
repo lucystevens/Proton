@@ -1,11 +1,11 @@
-package com.iw.test;
+package com.lithium.test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.iw.dependency.InstanceType;
-import com.iw.inject.Inject;
-import com.iw.inject.Injector;
+import com.lithium.dependency.InstanceType;
+import com.lithium.inject.Inject;
+import com.lithium.inject.Injector;
 
 public class DependencyInjectionTest {
 	

@@ -1,4 +1,4 @@
-package com.iw.scanner;
+package com.lithium.scanner;
 
 /**
  * An exception to be thrown if errors

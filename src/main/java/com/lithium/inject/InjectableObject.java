@@ -1,4 +1,4 @@
-package com.iw.inject;
+package com.lithium.inject;
 
 /**
  * An abstract class to allow dependencies to be

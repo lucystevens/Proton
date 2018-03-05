@@ -1,8 +1,8 @@
-package com.iw.test;
+package com.lithium.test;
 
-import com.iw.dependency.Dependency;
-import com.iw.dependency.InstanceType;
-import com.iw.inject.Inject;
+import com.lithium.dependency.Dependency;
+import com.lithium.dependency.InstanceType;
+import com.lithium.inject.Inject;
 
 @Dependency(type = InstanceType.MULTIPLE)
 public class SomeObject {

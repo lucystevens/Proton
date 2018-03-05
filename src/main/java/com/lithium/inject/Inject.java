@@ -1,4 +1,4 @@
-package com.iw.inject;
+package com.lithium.inject;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

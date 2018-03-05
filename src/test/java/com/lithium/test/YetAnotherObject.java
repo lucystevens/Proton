@@ -1,7 +1,7 @@
-package com.iw.test;
+package com.lithium.test;
 
-import com.iw.inject.Inject;
-import com.iw.inject.InjectableObject;
+import com.lithium.inject.Inject;
+import com.lithium.inject.InjectableObject;
 
 public class YetAnotherObject extends InjectableObject {
 	

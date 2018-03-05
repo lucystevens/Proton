@@ -1,7 +1,7 @@
-package com.iw.test;
+package com.lithium.test;
 
-import com.iw.dependency.Dependency;
-import com.iw.dependency.InstanceType;
+import com.lithium.dependency.Dependency;
+import com.lithium.dependency.InstanceType;
 
 @Dependency(type = InstanceType.SINGLETON)
 public class AnotherObject {

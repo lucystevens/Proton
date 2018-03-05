@@ -1,4 +1,4 @@
-package com.iw.scanner;
+package com.lithium.scanner;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package com.iw.dependency;
+package com.lithium.dependency;
 
 /**
  * An enum to determine the instantiation type e.g. Whether the

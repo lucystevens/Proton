@@ -1,4 +1,4 @@
-package com.iw.inject;
+package com.lithium.inject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -6,11 +6,12 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import com.iw.dependency.Dependency;
-import com.iw.dependency.DependencyCreationException;
-import com.iw.dependency.InstanceType;
-import com.iw.scanner.ClassScanner;
-import com.iw.scanner.ClassPath;
+
+import com.lithium.dependency.Dependency;
+import com.lithium.dependency.DependencyCreationException;
+import com.lithium.dependency.InstanceType;
+import com.lithium.scanner.ClassPath;
+import com.lithium.scanner.ClassScanner;
 
 /**
  * Singleton class for getting and injecting
