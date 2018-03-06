@@ -231,9 +231,7 @@ public class Injector {
 		
 		if(instance == null) throw new DependencyCreationException("", c);
 		
-		T dependency = c.cast(instance.get());
-		injectDependencies(dependency);
-		return dependency;
+		return c.cast(instance.get());
 	}
 	
 	/**
@@ -265,10 +263,11 @@ public class Injector {
 	 * @return An instance of the Class c
 	 */
 	public <T> T newInstance(Class<T> c) {
+		T instance = null;
 		Constructor<?> construct = getConstructor(c);
 		
 		if(construct == null){
-			return construct(c);
+			instance =  construct(c);
 		}
 		else {
 			// TODO change to use List rather than array
@@ -277,8 +276,11 @@ public class Injector {
 			for(int i = 0; i < classes.length; i++){
 				params[i] = getDependency(classes[i]);
 			}
-			return construct(c, params);
+			instance =  construct(c, params);
 		}
+		
+		injectDependencies(instance);
+		return instance;
 	}
 	
 	/**
