@@ -54,29 +54,43 @@ public class DependencyInjectionTest {
 		
 		DependencyWithDependencies d = injector.getDependency(DependencyWithDependencies.class);
 		
-		SingletonDependency s4 = d.singletonFieldTest();
+		SingletonDependency s4 = d.singletonConstructorTest();
 		result = testSingletonDependency(s4);
 		System.out.println("Test 7:\t\t" + result);
 		if(testPassed(result)) passed++;
 		
-		MultipleDependency m4 = d.multipleFieldTest();
+		MultipleDependency m4 = d.multipleConstructorTest();
 		result = testMultipleDependency(m4, 4);
 		System.out.println("Test 8:\t\t" + result);
 		if(testPassed(result)) passed++;
 		
-		SingletonDependency s5 = d.singletonConstructorTest();
+		SingletonDependency s5 = d.singletonFieldTest();
 		result = testSingletonDependency(s5);
 		System.out.println("Test 9:\t\t" + result);
 		if(testPassed(result)) passed++;
 		
-		MultipleDependency m5 = d.multipleConstructorTest();
+		MultipleDependency m5 = d.multipleFieldTest();
 		result = testMultipleDependency(m5, 5);
 		System.out.println("Test 10:\t" + result);
 		if(testPassed(result)) passed++;
 		
+		// Constructing using injector tests
+		
+		InjectorManagedObject imo = injector.newInstance(InjectorManagedObject.class);
+		
+		SingletonDependency s6 = imo.singletonConstructorTest();
+		result = testSingletonDependency(s6);
+		System.out.println("Test 11:\t" + result);
+		if(testPassed(result)) passed++;
+		
+		MultipleDependency m6 = imo.multipleConstructorTest();
+		result = testMultipleDependency(m6, 6);
+		System.out.println("Test 12:\t" + result);
+		if(testPassed(result)) passed++;
+		
 		// Test final results
 		
-		System.out.println("Tests passed : " + passed + "/10");
+		System.out.println("\nTests passed : " + passed + "/12");
 	}
 	
 	public static String testSingletonDependency(SingletonDependency dependency){

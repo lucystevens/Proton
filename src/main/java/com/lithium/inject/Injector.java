@@ -140,31 +140,6 @@ public class Injector {
 	}
 	
 	/**
-	 * Gets a new instance of the specified class:
-	 * If there is a constructor annotated with <code>@Inject</code>
-	 * then this will be used and the arguments will be injected as 
-	 * dependencies. Otherwise the default constructor will be used.
-	 * @param c The class to construct an instance of.
-	 * @return An instance of the Class c
-	 */
-	private Object newInstance(Class<?> c) {
-		Constructor<?> construct = getConstructor(c);
-		
-		if(construct == null){
-			return construct(c);
-		}
-		else {
-			// TODO change to use List rather than array
-			Class<?>[] classes = construct.getParameterTypes();
-			Object[] params = new Object[classes.length];
-			for(int i = 0; i < classes.length; i++){
-				params[i] = getDependency(classes[i]);
-			}
-			return construct(c, params);
-		}
-	}
-	
-	/**
 	 * Gets a constructor for a specified class:
 	 * @param c The class to get a constructor for.
 	 * @return The constructor annotated with <code>@Inject</code> if one
@@ -194,9 +169,9 @@ public class Injector {
 	 * @throws DependencyCreationException If there is
 	 * not constructor matching the supplied parameters.
 	 */
-	private Object construct(Class<?> c, Object...params){
+	private <T> T construct(Class<T> c, Object...params){
 		try {
-			Constructor<?> con = c.getDeclaredConstructor(argsToClasses(params));
+			Constructor<T> con = c.getDeclaredConstructor(argsToClasses(params));
 			con.setAccessible(true);
 			return con.newInstance(params);
 		} catch(Exception e){
@@ -256,7 +231,9 @@ public class Injector {
 		
 		if(instance == null) throw new DependencyCreationException("", c);
 		
-		return c.cast(instance.get());
+		T dependency = c.cast(instance.get());
+		injectDependencies(dependency);
+		return dependency;
 	}
 	
 	/**
@@ -276,6 +253,31 @@ public class Injector {
 					&& !Modifier.isStatic(f.getModifiers())){
 						injectIntoField(f, o);
 			}
+		}
+	}
+	
+	/**
+	 * Gets a new instance of the specified class:
+	 * If there is a constructor annotated with <code>@Inject</code>
+	 * then this will be used and the arguments will be injected as 
+	 * dependencies. Otherwise the default constructor will be used.
+	 * @param c The class to construct an instance of.
+	 * @return An instance of the Class c
+	 */
+	public <T> T newInstance(Class<T> c) {
+		Constructor<?> construct = getConstructor(c);
+		
+		if(construct == null){
+			return construct(c);
+		}
+		else {
+			// TODO change to use List rather than array
+			Class<?>[] classes = construct.getParameterTypes();
+			Object[] params = new Object[classes.length];
+			for(int i = 0; i < classes.length; i++){
+				params[i] = getDependency(classes[i]);
+			}
+			return construct(c, params);
 		}
 	}
 	
