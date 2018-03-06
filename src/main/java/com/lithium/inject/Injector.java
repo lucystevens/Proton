@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import com.lithium.dependency.Dependency;
 import com.lithium.dependency.DependencyCreationException;
 import com.lithium.dependency.InstanceType;
+import com.lithium.dependency.MissingConstructorException;
 import com.lithium.scanner.ClassPath;
 import com.lithium.scanner.ClassScanner;
 
@@ -170,13 +171,13 @@ public class Injector {
 	 * not constructor matching the supplied parameters.
 	 */
 	private <T> T construct(Class<T> c, Object...params){
+		Class<?>[] classes = argsToClasses(params);
 		try {
-			Constructor<T> con = c.getDeclaredConstructor(argsToClasses(params));
+			Constructor<T> con = c.getDeclaredConstructor(classes);
 			con.setAccessible(true);
 			return con.newInstance(params);
 		} catch(Exception e){
-			// TODO change to be more generic, match params
-			 throw new DependencyCreationException("Default constructor not found.", c);
+			 throw new MissingConstructorException(c, classes);
 		}
 	}
 	
@@ -193,6 +194,20 @@ public class Injector {
 			classes[i] = args[i].getClass();
 		}
 		return classes;
+	}
+	
+	/**
+	 * Converts an array of classes to an array of dependencies
+	 * by retrieving the dependency associated with each class.
+	 * @param classes An array of classes
+	 * @return An array of dependencies
+	 */
+	private Object[] classesToDependencies(Class<?>[] classes){
+		Object[] params = new Object[classes.length];
+		for(int i = 0; i < classes.length; i++){
+			params[i] = getDependency(classes[i]);
+		}
+		return params;
 	}
 	
 	/**
@@ -270,12 +285,8 @@ public class Injector {
 			instance =  construct(c);
 		}
 		else {
-			// TODO change to use List rather than array
 			Class<?>[] classes = construct.getParameterTypes();
-			Object[] params = new Object[classes.length];
-			for(int i = 0; i < classes.length; i++){
-				params[i] = getDependency(classes[i]);
-			}
+			Object[] params = classesToDependencies(classes);
 			instance =  construct(c, params);
 		}
 		
