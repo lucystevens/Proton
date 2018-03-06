@@ -16,7 +16,7 @@ Proton is currently in alpha and documentation will be updated as development co
 ### Injection into objects
 
 Dependency Injection with Proton is designed to be as simple and straightfoward as possible.
-There are three ways to inject a dependency into an object or class;
+There are four ways to inject a dependency into an object or class;
 
 #### Static Injection
 Simply annotate a static field within a class with `@Inject` and the dependency will be injected when `Injector` is initialised.
@@ -39,6 +39,15 @@ The dependencies will be injected within the super constructor.
 		
 	}
 	
+#### Injector managed construction
+Objects with dependencies to be injected can be created using `Injector.newInstance(Class c)` where c is the class of the object to create.
+
+		Injector injector = Injector.getInstance();
+		InjectorManagedObject imo = injector.newInstance(InjectorManagedObject.class);
+		
+If the object has a constructor marked with `@Inject`, this will be called and appropriate dependencies passed in as parameters. Otherwise the default constructor will be used.
+In addition to this, any fields annotated with `@Inject` will be injected.
+	
 #### Manual injection
 If neither of the previous two methods are suitable for the situation, then the dependencies must be injected manually.
 This can be done by annotating the dependency fields with `@Inject` as shown above and passing the created object to the `Injector.injectDependencies(Object o)` method.
@@ -60,7 +69,7 @@ Other than being injected into objects, dependencies can also be retrieved manua
 
 #### Dependencies within dependencies
 
-Currently dependencies can only be injected into other dependencies through the constructor like so;
+Dependencies can be injected into other dependencies through the constructor like so;
 
 	private SingletonDependency singletonConstructor;
 	
@@ -72,7 +81,9 @@ Currently dependencies can only be injected into other dependencies through the 
 		this.multipleConstructor = multipleConstructor;
 	}
 	
-Ensure that you don't have any circular dependencies when defining them like this.
+or through annotating fields with `@Inject` as shown above for objects.
+	
+Ensure that you don't have any circular dependencies when defining dependencies within dependencies!
 
 #### Registering external dependencies
 
