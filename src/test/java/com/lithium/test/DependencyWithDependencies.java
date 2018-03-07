@@ -2,7 +2,7 @@ package com.lithium.test;
 
 import com.lithium.dependency.Dependency;
 import com.lithium.dependency.InstanceType;
-import com.lithium.inject.Inject;
+import com.lithium.inject.config.Inject;
 
 @Dependency(type = InstanceType.MULTIPLE)
 public class DependencyWithDependencies {

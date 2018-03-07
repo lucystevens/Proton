@@ -1,6 +1,6 @@
 package com.lithium.test;
 
-import com.lithium.inject.Inject;
+import com.lithium.inject.config.Inject;
 
 public class SomeObject {
 	

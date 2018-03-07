@@ -1,4 +1,6 @@
-package com.lithium.inject;
+package com.lithium.inject.config;
+
+import com.lithium.inject.Injector;
 
 /**
  * An abstract class to allow dependencies to be

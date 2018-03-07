@@ -1,7 +1,7 @@
 package com.lithium.test;
 
-import com.lithium.inject.Inject;
-import com.lithium.inject.InjectableObject;
+import com.lithium.inject.config.Inject;
+import com.lithium.inject.config.InjectableObject;
 
 public class SomeInjectableObject extends InjectableObject{
 	

@@ -13,11 +13,12 @@ public enum InstanceType {
 	 * Indicates that the same instance of a dependency
 	 * should be used every time it is injected.
 	 */
-	SINGLETON, 
+	SINGLETON(), 
 	
 	/**
 	 * Indicates that a new instance of a dependency
 	 * should be created every time it is injected.
 	 */
 	MULTIPLE;
+
 }

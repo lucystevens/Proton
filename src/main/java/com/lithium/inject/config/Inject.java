@@ -1,4 +1,4 @@
-package com.lithium.inject;
+package com.lithium.inject.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -2,15 +2,14 @@ package com.lithium.inject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.lithium.dependency.Dependency;
-import com.lithium.dependency.DependencyCreationException;
 import com.lithium.dependency.InstanceType;
-import com.lithium.dependency.MissingConstructorException;
+import com.lithium.dependency.exceptions.DependencyCreationException;
+import com.lithium.dependency.exceptions.MissingDependencyException;
+import com.lithium.inject.config.InjectableObject;
 import com.lithium.scanner.ClassPath;
 import com.lithium.scanner.ClassScanner;
 
@@ -36,6 +35,7 @@ public class Injector {
 	}
 	
 	private Map<Class<?>, Supplier<Object>> dependencies = new HashMap<>();
+	private InjectionTools tools = new InjectionTools();
 	
 	/**
 	 * Creates the single instance of this Injector,
@@ -43,7 +43,13 @@ public class Injector {
 	 * injected static dependencies where appropriate.
 	 */
 	private Injector(){
-		scanClasses();
+		DependencyManager manager = new DependencyManager(this);
+		this.dependencies = manager.loadDependencies();
+		
+		this.dependencies.put(ClassPath.class, ClassScanner::getClassPath);
+		this.dependencies.put(Injector.class, () -> this);
+		
+		injectStaticFields();
 	}
 	
 	/**
@@ -51,7 +57,7 @@ public class Injector {
 	 * class found, injects dependencies into static
 	 * fields annotated by the <code>@Inject</code> annotation. 
 	 */
-	private void scanClasses(){
+	private void injectStaticFields(){
 		ClassPath classpath = ClassScanner.getClassPath();
 		for(Class<?> c : classpath.getClasses()){
 			scanFields(c);
@@ -65,18 +71,26 @@ public class Injector {
 	 */
 	private void scanFields(Class<?> c){
 		for(Field f : c.getDeclaredFields()){
-			if(isInjectable(f)) injectIntoField(f, null);
+			if(tools.isInjectable(f, true)) injectIntoField(f, null);
 		}
 	}
 	
 	/**
-	 * Determines whether a field is injectable e.g.
-	 * whether a dependency should be injected into it.
-	 * @param f The field to check
-	 * @return True if injectable, false if not.
+	 * Creates the supplier for a dependency. 
+	 * @param c The class to create the supplier for
+	 * @param type The InstanceType; e.g. whether an existing instance
+	 * should always be supplied, or a new instance created
+	 * @return A lambda function that either creates a new instance
+	 * or returns the existing singleton instance when called.
 	 */
-	private boolean isInjectable(Field f){
-		return f.getAnnotation(Inject.class) != null && Modifier.isStatic(f.getModifiers());
+	Supplier<Object> getSupplier(Class<?> c, InstanceType type){
+		if(type == InstanceType.SINGLETON){
+			Object instance = newInstance(c);
+			return () -> instance;
+		}
+		else {
+			return () -> newInstance(c);
+		}
 	}
 	
 	/**
@@ -97,132 +111,17 @@ public class Injector {
 	}
 	
 	/**
-	 * Loads the supplier for a dependency class and stores
-	 * in the dependency map for the class and all interfaces.
-	 * @param c The class to load as a dependency. Must be
-	 * annotated with <code>@Dependency</code>
-	 */
-	private void loadDependencies(Class<?> c){
-		if(c.getAnnotation(Dependency.class) == null) throw new DependencyCreationException("No @Dependency annotation found.", c);
-		InstanceType type = c.getAnnotation(Dependency.class).type();
-		loadDependencies(c, type);
-	}
-	
-	/**
-	 * Loads the supplier for a dependency class and stores
-	 * in the dependency map for the class and all interfaces.
-	 * @param c The class to load as a dependency.
-	 * @param type The InstanceType for the dependency
-	 */
-	private void loadDependencies(Class<?> c, InstanceType type){
-		Supplier<Object> instance = getSupplier(c, type);
-		loadDependency(c, instance);
-		for(Class<?> iface : c.getInterfaces()){
-			loadDependency(iface, instance);
-		}
-	}
-	
-	/**
-	 * Creates the supplier for a dependency. 
-	 * @param c The class to create the supplier for
-	 * @param type The InstanceType; e.g. whether an existing instance
-	 * should always be supplied, or a new instance created
-	 * @return A lambda function that either creates a new instance
-	 * or returns the existing singleton instance when called.
-	 */
-	private Supplier<Object> getSupplier(Class<?> c, InstanceType type){
-		if(type == InstanceType.SINGLETON){
-			Object instance = newInstance(c);
-			return () -> instance;
-		}
-		else {
-			return () -> newInstance(c);
-		}
-	}
-	
-	/**
-	 * Gets a constructor for a specified class:
-	 * @param c The class to get a constructor for.
-	 * @return The constructor annotated with <code>@Inject</code> if one
-	 * exists, otherwise the default constructor.
-	 * @throws DependencyCreationException If there are multiple 
-	 * constructors annotated with <code>@Inject</code>
-	 */
-	private Constructor<?> getConstructor(Class<?> c){
-		Constructor<?> construct = null;
-		
-		for(Constructor<?> con : c.getDeclaredConstructors()){
-			if(con.getAnnotation(Inject.class) != null){
-				if(construct != null) throw new DependencyCreationException("Multiple constructors annotated with @Inject.", c);
-				else construct = con;
-			}
-		}
-		
-		return construct;
-	}
-	
-	/**
-	 * Constructs an object, given the parameters to use.
-	 * @param c The class to construct an instance of.
-	 * @param params The parameters to pass to the constructor.
-	 * @return A new instance of the object, constructed using the
-	 * supplied parameters.
-	 * @throws DependencyCreationException If there is
-	 * not constructor matching the supplied parameters.
-	 */
-	private <T> T construct(Class<T> c, Object...params){
-		Class<?>[] classes = argsToClasses(params);
-		try {
-			Constructor<T> con = c.getDeclaredConstructor(classes);
-			con.setAccessible(true);
-			return con.newInstance(params);
-		} catch(Exception e){
-			 throw new MissingConstructorException(c, classes);
-		}
-	}
-	
-	/**
-	 * Converts an array of arguments to an array of
-	 * their respective classes. Used for retrieving methods
-	 * and constructors with specific parameters from a class.
-	 * @param args An array of arguments to be passed to a method
-	 * @return An array of classes of the original arguments.
-	 */
-	private Class<?>[] argsToClasses(Object...args){
-		Class<?>[] classes = new Class<?>[args.length];
-		for(int i = 0; i<args.length; i++){
-			classes[i] = args[i].getClass();
-		}
-		return classes;
-	}
-	
-	/**
 	 * Converts an array of classes to an array of dependencies
 	 * by retrieving the dependency associated with each class.
 	 * @param classes An array of classes
 	 * @return An array of dependencies
 	 */
-	private Object[] classesToDependencies(Class<?>[] classes){
+	public Object[] getDependencies(Class<?>[] classes){
 		Object[] params = new Object[classes.length];
 		for(int i = 0; i < classes.length; i++){
 			params[i] = getDependency(classes[i]);
 		}
 		return params;
-	}
-	
-	/**
-	 * Loads a dependency into the dependency map
-	 * @param d The class to store the dependency under. This may be 
-	 * the actual dependency class, or any interface it implements.
-	 * @param instance The supplier to use to get an instance of this
-	 * dependency.
-	 * @throws DependencyCreationException If a dependency already exists
-	 * for the specified class
-	 */
-	private void loadDependency(Class<?> d, Supplier<Object> instance){
-		if(dependencies.containsKey(d)) throw new DependencyCreationException("Dependency already exists for class.", d);
-		else dependencies.put(d, instance);
-		
 	}
 	
 	/**
@@ -239,14 +138,11 @@ public class Injector {
 	 */
 	public <T> T getDependency(Class<T> c){
 		Supplier<Object> instance = dependencies.get(c);
-		if(instance == null){
-			loadDependencies(c);
-			instance = dependencies.get(c);
-		}
+		if(instance == null) throw new MissingDependencyException(c);
 		
-		if(instance == null) throw new DependencyCreationException("", c);
-		
-		return c.cast(instance.get());
+		Object o = instance.get();
+		if(o instanceof InjectionException) throw (InjectionException) o;
+		else return c.cast(o);
 	}
 	
 	/**
@@ -262,10 +158,7 @@ public class Injector {
 	public void injectDependencies(Object o){
 		Class<?> c = o.getClass();
 		for(Field f : c.getDeclaredFields()){
-			if(f.getAnnotation(Inject.class) != null
-					&& !Modifier.isStatic(f.getModifiers())){
-						injectIntoField(f, o);
-			}
+			if(tools.isInjectable(f, false)) injectIntoField(f, o);
 		}
 	}
 	
@@ -279,33 +172,18 @@ public class Injector {
 	 */
 	public <T> T newInstance(Class<T> c) {
 		T instance = null;
-		Constructor<?> construct = getConstructor(c);
+		Constructor<?> construct = tools.getConstructor(c);
 		
 		if(construct == null){
-			instance =  construct(c);
+			instance = tools.construct(c);
 		}
 		else {
 			Class<?>[] classes = construct.getParameterTypes();
-			Object[] params = classesToDependencies(classes);
-			instance =  construct(c, params);
+			Object[] params = getDependencies(classes);
+			instance =  tools.construct(c, params);
 		}
-		
 		injectDependencies(instance);
 		return instance;
-	}
-	
-	/**
-	 * Registers a new dependency. This should be used for
-	 * third party classes that cannot be annotated with
-	 * the <code>@Dependency</code> annotation and have
-	 * to be registered manually.
-	 * @param c The class to register
-	 * @param type The instantiation type e.g. Whether the
-	 * same instance should be returned whenever used, or
-	 * whether a new instance should be created.
-	 */
-	public void registerDependency(Class<?> c, InstanceType type){
-		loadDependencies(c, type);
 	}
 
 }

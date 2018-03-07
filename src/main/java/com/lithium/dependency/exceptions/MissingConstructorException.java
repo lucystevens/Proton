@@ -1,4 +1,4 @@
-package com.lithium.dependency;
+package com.lithium.dependency.exceptions;
 
 public class MissingConstructorException extends DependencyCreationException {
 
