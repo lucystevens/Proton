@@ -67,13 +67,15 @@ public class DependencyInjectionTest {
 		System.out.println("Test 8:\t\t" + result);
 		if(testPassed(result)) passed++;
 		
-		SingletonDependency s5 = d.singletonFieldTest();
+		DependencyWithDependencies d2 = (DependencyWithDependencies) injector.getDependency(BlankSuperClass.class);
+		
+		SingletonDependency s5 = d2.singletonFieldTest();
 		result = testSingletonDependency(s5);
 		System.out.println("Test 9:\t\t" + result);
 		if(testPassed(result)) passed++;
 		
-		MultipleDependency m5 = d.multipleFieldTest();
-		result = testMultipleDependency(m5, 5);
+		MultipleDependency m5 = d2.multipleFieldTest();
+		result = testMultipleDependency(m5, 7);
 		System.out.println("Test 10:\t" + result);
 		if(testPassed(result)) passed++;
 		
@@ -87,7 +89,7 @@ public class DependencyInjectionTest {
 		if(testPassed(result)) passed++;
 		
 		MultipleDependency m6 = imo.multipleConstructorTest();
-		result = testMultipleDependency(m6, 6);
+		result = testMultipleDependency(m6, 8);
 		System.out.println("Test 12:\t" + result);
 		if(testPassed(result)) passed++;
 		

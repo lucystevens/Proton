@@ -5,7 +5,7 @@ import com.lithium.dependency.InstanceType;
 import com.lithium.inject.config.Inject;
 
 @Dependency(type = InstanceType.MULTIPLE)
-public class DependencyWithDependencies {
+public class DependencyWithDependencies extends BlankSuperClass{
 
 	@Inject
 	private SingletonDependency singletonField;

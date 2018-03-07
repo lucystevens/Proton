@@ -39,14 +39,23 @@ public class DependencyManager {
 	
 	/**
 	 * Loads the supplier for a dependency class and stores
-	 * in the dependency map for the class and all interfaces.
+	 * in the dependency map for the class and all interfaces and superclasses.
 	 * @param c The class to load as a dependency. Must be
 	 * annotated with <code>@Dependency</code>
 	 */
 	private void loadDependency(Class<?> dep){
 		InstanceType type = dep.getAnnotation(Dependency.class).type();
 		Supplier<Object> instance = injector.getSupplier(dep, type);
+		
+		// Load concrete dependency class
 		loadDependency(dep, instance, true);
+		
+		// Load superclasses
+		for(Class<?> superclass : tools.getSuperClasses(dep)){
+			loadDependency(superclass, instance, false);
+		}
+		
+		// Load implementing interfaces
 		for(Class<?> iface : dep.getInterfaces()){
 			loadDependency(iface, instance, false);
 		}

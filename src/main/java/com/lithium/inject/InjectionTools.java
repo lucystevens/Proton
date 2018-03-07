@@ -90,5 +90,15 @@ public class InjectionTools {
 		}
 		return subDependencies;
 	}
+	
+	public List<Class<?>> getSuperClasses(Class<?> parent){
+		List<Class<?>> superClasses = new ArrayList<>();
+		Class<?> superclass = parent.getSuperclass();
+		while(superclass != null){
+			superClasses.add(superclass);
+			superclass = superclass.getSuperclass();
+		}
+		return superClasses;
+	}
 
 }
