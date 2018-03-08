@@ -3,6 +3,7 @@ package com.lithium.scanner;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -10,8 +11,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import com.lithium.inject.Injector;
 
 /**
  * A static class that scans the Java class
@@ -80,8 +79,7 @@ public class ClassScanner {
 	 * classes from inside a jar file
 	 */
 	private static void loadClasses(URL url) throws IOException{
-		String path = URLDecoder.decode(url.getPath().replace("/", "\\"), "UTF-8");
-		if(path.matches("\\\\[A-Z]:.*")) path = path.substring(1);
+		String path = formatURL(url);
 		System.out.println(path);
 		if(isJar()) loadClassesJar();
 		else{
@@ -89,6 +87,11 @@ public class ClassScanner {
 			if(root.isDirectory()) loadClasses(path, root);
 			else loadClass(path, root.getPath());
 		}
+	}
+	
+	private static String formatURL(URL url) throws UnsupportedEncodingException{
+		String path = URLDecoder.decode(url.getPath(), "UTF-8");
+		return path.matches("(\\\\|\\/)[A-Z]:.*")? path.substring(1) : path;
 	}
 	
 	/**
@@ -137,12 +140,14 @@ public class ClassScanner {
 	 * @param path The path to the file to load.
 	 */
 	private static void loadClass(String root, String path){
+		root = root.replaceAll("\\\\|\\/", ".");
 		try{
 			if(path.endsWith(".class")){
 				
 				// Formats the path name to load it as a class
-				String name = path.replace(root, "").replaceAll("\\\\|\\/", ".").replace(".class", "");
-				System.out.println(name);
+				System.out.println(path);
+				String name = path.replaceAll("\\\\|\\/", ".").replace(root, "").replace(".class", "");
+				System.out.println(name + "\n");
 				
 				/*
 				 * Do not initialise Injector or DependencyManager as these will
