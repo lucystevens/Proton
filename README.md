@@ -6,7 +6,7 @@ It has been designed to be used for smaller projects where all the complexities,
 ## Including Proton in your project
 
 Currently to include Proton in your project you must clone the repository and import the project dependency manually.
-I am currently working on adding the dependency to the maven central repository.
+The project will be available from the maven central repository when it leaves the alpha stage of development
 
 
 ## Documentation
@@ -61,11 +61,11 @@ This can be done by annotating the dependency fields with `@Inject` as shown abo
 
 Dependencies must be defined prior to them being injected into objects.
 This is done by annotating them using `@Dependency` with an `InstanceType` denoting whether only a single instance of the dependency should exist, or whether a new one should be created every time it needs to be injected. 
-It should be noted that currently dependencies are mapped for both their class, and all intefaces they implement. This means that you cannot have multiple dependencies that implement the same interface.
+Dependencies are mapped for not only their concrete class, but also their superclasses and any interfaces they implement. 
 
 #### Retrieving dependencies
 
-Other than being injected into objects, dependencies can also be retrieved manually by calling `Injector.getDependency(Class<?> dependency)`, with the passed class being the dependency or any interface it implements.
+Other than being injected into objects, dependencies can also be retrieved manually by calling `Injector.getDependency(Class<?> dependency)`, with the passed class being the dependency, any interface it implements, or any superclass it extends.
 
 #### Dependencies within dependencies
 
@@ -84,13 +84,6 @@ Dependencies can be injected into other dependencies through the constructor lik
 or through annotating fields with `@Inject` as shown above for objects.
 	
 Ensure that you don't have any circular dependencies when defining dependencies within dependencies!
-
-#### Registering external dependencies
-
-Sometimes external dependencies are needed to be added to a project, which cannot be annotated with `@Dependency`.
-These can be registered by using `Injector.registerDependency(Class<?> dependency, InstanceType type)` where the InstanceType is as defined above.
-It should also be noted that since these dependencies are only registered after the Injector is initialised, they cannot be injected into static fields or other dependencies.
-There is currently an open issue to extend the configuration to allow this.
 
 ### Classpath utilities
 
