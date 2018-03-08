@@ -80,7 +80,8 @@ public class ClassScanner {
 	 * classes from inside a jar file
 	 */
 	private static void loadClasses(URL url) throws IOException{
-		String path = URLDecoder.decode(url.getPath().substring(1).replace("/", "\\"), "UTF-8");
+		String path = URLDecoder.decode(url.getPath().replace("/", "\\"), "UTF-8");
+		if(path.startsWith("\\")) path = path.substring(1);
 		System.out.println(path);
 		if(isJar()) loadClassesJar();
 		else{
