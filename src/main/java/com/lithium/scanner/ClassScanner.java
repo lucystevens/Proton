@@ -80,7 +80,6 @@ public class ClassScanner {
 	 */
 	private static void loadClasses(URL url) throws IOException{
 		String path = formatURL(url);
-		System.out.println(path);
 		if(isJar()) loadClassesJar();
 		else{
 			File root = new File(path);
@@ -89,8 +88,16 @@ public class ClassScanner {
 		}
 	}
 	
+	/**
+	 * Decodes a URL into a file path
+	 * @param url The URL to decode
+	 * @return A String representing a system file path
+	 * @throws UnsupportedEncodingException 
+	 */
 	private static String formatURL(URL url) throws UnsupportedEncodingException{
 		String path = URLDecoder.decode(url.getPath(), "UTF-8");
+		
+		// This matches windows file patterns (e.g. \C:) and removes the '\'
 		return path.matches("(\\\\|\\/)[A-Z]:.*")? path.substring(1) : path;
 	}
 	
@@ -140,14 +147,15 @@ public class ClassScanner {
 	 * @param path The path to the file to load.
 	 */
 	private static void loadClass(String root, String path){
+		
+		// Removes line separators from root path
 		root = root.replaceAll("\\\\|\\/", ".");
+		
 		try{
 			if(path.endsWith(".class")){
 				
 				// Formats the path name to load it as a class
-				System.out.println(path);
 				String name = path.replaceAll("\\\\|\\/", ".").replace(root, "").replace(".class", "");
-				System.out.println(name + "\n");
 				
 				/*
 				 * Do not initialise Injector or DependencyManager as these will
