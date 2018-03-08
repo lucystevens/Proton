@@ -11,6 +11,12 @@ public class InjectorManagedObject {
 	private MultipleDependency multipleConstructor;
 	
 	@Inject
+	private SingletonDependency singletonField;
+	
+	@Inject
+	private MultipleDependency multipleField;
+	
+	@Inject
 	private InjectorManagedObject(SingletonDependency singletonConstructor, MultipleDependency multipleConstructor){
 		this.singletonConstructor = singletonConstructor;
 		this.multipleConstructor = multipleConstructor;
@@ -22,6 +28,14 @@ public class InjectorManagedObject {
 
 	public MultipleDependency multipleConstructorTest() {
 		return multipleConstructor;
+	}
+	
+	public SingletonDependency singletonFieldTest() {
+		return singletonField;
+	}
+
+	public MultipleDependency multipleFieldTest() {
+		return multipleField;
 	}
 
 }

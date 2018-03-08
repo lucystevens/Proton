@@ -1,4 +1,4 @@
-package com.lithium.test.injection;
+package com.lithium.test.cases;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -8,28 +8,23 @@ import org.junit.Test;
 import com.lithium.inject.Injector;
 import com.lithium.test.dependencies.MultipleDependency;
 import com.lithium.test.dependencies.SingletonDependency;
-import com.lithium.test.objects.SomeObject;
+import com.lithium.test.objects.SomeInjectableObject;
 
-public class TestManualInjection {
+public class TestExtensionInjection {
 	
 	Injector inject = Injector.getInstance();
+	SomeInjectableObject sio = new SomeInjectableObject();
 	
 	@Test
 	public void testSingletonDependency(){
-		SomeObject so = new SomeObject();
-		inject.injectDependencies(so);
-		
-		SingletonDependency s = so.singletonFieldTest();
+		SingletonDependency s = sio.singletonFieldTest();
 		assertNotNull("Dependency not injected", s);
 		assertTrue("New instance of dependency", s.getInstance() == 1);
 	}
 	
 	@Test
 	public void testMultipleDependency(){
-		SomeObject so = new SomeObject();
-		inject.injectDependencies(so);
-		
-		MultipleDependency m = so.multipleFieldTest();
+		MultipleDependency m = sio.multipleFieldTest();
 		assertNotNull("Dependency not injected", m);
 		assertTrue("New instance of dependency not created", m.isUniqueInstance());
 	}

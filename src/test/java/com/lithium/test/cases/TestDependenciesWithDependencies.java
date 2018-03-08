@@ -1,4 +1,4 @@
-package com.lithium.test.injection;
+package com.lithium.test.cases;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

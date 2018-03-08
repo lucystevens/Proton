@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.lithium.inject.Injector;
+
 /**
  * A static class that scans the Java class
  * path, retrieves all <code>.class</code> files
@@ -137,11 +139,16 @@ public class ClassScanner {
 			if(path.endsWith(".class")){
 				
 				// Formats the path name to load it as a class
-				Class<?> c = Class.forName(path.replace(root, "")
-												.replace("\\", ".")
-												.replace("/",  ".")
-												.replace(".class", ""));
-				classes.add(c);
+				String name = path.replace(root, "").replaceAll("\\\\|\\/", ".").replace(".class", "");
+				
+				/*
+				 * Do not initialise Injector or DependencyManager as these will
+				 * try and retrieve the partially initialised ClassPath and fail
+				 */
+				if(!name.equals("com.lithium.inject.DependencyManager") && !name.equals("com.lithium.inject.Injector")){
+					Class<?> c = Class.forName(name);
+					classes.add(c);
+				}
 			}
 		} catch(ClassNotFoundException e){
 			// Just don't load the class if it can't be found

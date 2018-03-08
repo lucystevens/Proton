@@ -82,7 +82,7 @@ public class Injector {
 			Object dependency = getDependency(f.getType());
 			f.setAccessible(true);
 			f.set(o, dependency);
-		} catch (Exception e) {
+		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new InjectionException(e, f.getClass());
 		}
 	}
