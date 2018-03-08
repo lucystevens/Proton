@@ -1,4 +1,4 @@
-package com.lithium.test;
+package com.lithium.test.dependencies;
 
 import java.io.Serializable;
 

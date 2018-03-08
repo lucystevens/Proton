@@ -1,4 +1,4 @@
-package com.lithium.test;
+package com.lithium.test.dependencies;
 
 import com.lithium.dependency.Dependency;
 import com.lithium.dependency.InstanceType;

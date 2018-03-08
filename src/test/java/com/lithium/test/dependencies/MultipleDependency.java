@@ -1,7 +1,6 @@
-package com.lithium.test;
+package com.lithium.test.dependencies;
 
 import java.io.Serializable;
-
 import com.lithium.dependency.Dependency;
 import com.lithium.dependency.InstanceType;
 
@@ -10,16 +9,14 @@ public class MultipleDependency implements Serializable{
 
 	private static final long serialVersionUID = -3000498178277330865L;
 
-	private static int instanceCount = 0;
+	private boolean unique = true;
 	
-	private int instance;
-	
-	private MultipleDependency(){
-		instance = ++instanceCount;
-	}
-
-	public int getInstance() {
-		return instance;
+	public boolean isUniqueInstance(){
+		if(unique){
+			unique = false;
+			return true;
+		}
+		else return false;
 	}
 
 }

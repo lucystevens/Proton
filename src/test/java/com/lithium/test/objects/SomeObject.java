@@ -1,6 +1,8 @@
-package com.lithium.test;
+package com.lithium.test.objects;
 
 import com.lithium.inject.config.Inject;
+import com.lithium.test.dependencies.MultipleDependency;
+import com.lithium.test.dependencies.SingletonDependency;
 
 public class SomeObject {
 	
