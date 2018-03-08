@@ -81,6 +81,7 @@ public class ClassScanner {
 	 */
 	private static void loadClasses(URL url) throws IOException{
 		String path = URLDecoder.decode(url.getPath().substring(1).replace("/", "\\"), "UTF-8");
+		System.out.println(path);
 		if(isJar()) loadClassesJar();
 		else{
 			File root = new File(path);
