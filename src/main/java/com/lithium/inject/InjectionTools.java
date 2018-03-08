@@ -5,14 +5,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
-
-import com.lithium.dependency.InstanceType;
 import com.lithium.dependency.exceptions.DependencyCreationException;
 import com.lithium.dependency.exceptions.MissingConstructorException;
 import com.lithium.inject.config.Inject;
 
+/**
+ * A tools class to separate out stateless methods
+ * from the {@link Injector} and {@link DependencyManager}.
+ * 
+ * @author Luke Stevens
+ *
+ */
 public class InjectionTools {
+	
+	// Restrict access to package
+	InjectionTools(){}
 	
 	/**
 	 * Determines whether a field is injectable e.g.
@@ -23,29 +30,30 @@ public class InjectionTools {
 	 * injectable methods, and vice-versa
 	 * @return True if injectable, false if not.
 	 */
-	public boolean isInjectable(Field f, boolean checkStatic){
+	boolean isInjectable(Field f, boolean checkStatic){
 		return f.getAnnotation(Inject.class) != null && (checkStatic == Modifier.isStatic(f.getModifiers()));
 	}
 	
 	/**
-	 * Gets a constructor for a specified class:
+	 * Gets a constructor types for the injection constructor to
+	 * use for the given.
 	 * @param c The class to get a constructor for.
-	 * @return The constructor annotated with <code>@Inject</code> if one
-	 * exists, otherwise the default constructor.
+	 * @return The parameter types for constructor annotated with
+	 * <code>@Inject</code> if one exists, otherwise the default constructor.
 	 * @throws DependencyCreationException If there are multiple 
 	 * constructors annotated with <code>@Inject</code>
 	 */
-	public Constructor<?> getConstructor(Class<?> c){
-		Constructor<?> construct = null;
+	Class<?>[] getConstructorTypes(Class<?> c){
+		Class<?>[] types = {};
 		
 		for(Constructor<?> con : c.getDeclaredConstructors()){
 			if(con.getAnnotation(Inject.class) != null){
-				if(construct != null) throw new DependencyCreationException("Multiple constructors annotated with @Inject.", c);
-				else construct = con;
+				if(types.length > 0) throw new DependencyCreationException("Multiple constructors annotated with @Inject.", c);
+				else types = con.getParameterTypes();
 			}
 		}
 		
-		return construct;
+		return types;
 	}
 	
 	/**
@@ -57,7 +65,7 @@ public class InjectionTools {
 	 * @throws DependencyCreationException If there is
 	 * not constructor matching the supplied parameters.
 	 */
-	public <T> T construct(Class<T> c, Object...params){
+	<T> T construct(Class<T> c, Object...params){
 		Class<?>[] classes = argsToClasses(params);
 		try {
 			Constructor<T> con = c.getDeclaredConstructor(classes);
@@ -75,7 +83,7 @@ public class InjectionTools {
 	 * @param args An array of arguments to be passed to a method
 	 * @return An array of classes of the original arguments.
 	 */
-	public Class<?>[] argsToClasses(Object...args){
+	Class<?>[] argsToClasses(Object...args){
 		Class<?>[] classes = new Class<?>[args.length];
 		for(int i = 0; i<args.length; i++){
 			classes[i] = args[i].getClass();
@@ -83,15 +91,33 @@ public class InjectionTools {
 		return classes;
 	}
 	
-	public List<Class<?>> getSubDependencies(Class<?> parent){
+	/**
+	 * Gets all sub dependencies from a parent dependency
+	 * @param parent The parent dependency class
+	 * @return A List of all sub dependencies within a parent
+	 * dependency
+	 */
+	List<Class<?>> getSubDependencies(Class<?> parent){
 		List<Class<?>> subDependencies = new ArrayList<>();
+		
+		// Get field sub dependencies
 		for(Field f : parent.getDeclaredFields()){
 			if(isInjectable(f, false)) subDependencies.add(f.getType());
+		}
+		
+		// Get constructor sub dependencies
+		for(Class<?> c : getConstructorTypes(parent)){
+			subDependencies.add(c);
 		}
 		return subDependencies;
 	}
 	
-	public List<Class<?>> getSuperClasses(Class<?> parent){
+	/**
+	 * Gets all superclasses for a given class
+	 * @param parent The class to get all superclasses for
+	 * @return A List of superclasses for the given class
+	 */
+	List<Class<?>> getSuperClasses(Class<?> parent){
 		List<Class<?>> superClasses = new ArrayList<>();
 		Class<?> superclass = parent.getSuperclass();
 		while(superclass != null){

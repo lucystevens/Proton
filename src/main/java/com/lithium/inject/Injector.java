@@ -1,6 +1,5 @@
 package com.lithium.inject;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +9,7 @@ import com.lithium.dependency.InstanceType;
 import com.lithium.dependency.exceptions.DependencyCreationException;
 import com.lithium.dependency.exceptions.MissingDependencyException;
 import com.lithium.inject.config.InjectableObject;
+import com.lithium.inject.exceptions.InjectionException;
 import com.lithium.scanner.ClassPath;
 import com.lithium.scanner.ClassScanner;
 
@@ -49,30 +49,7 @@ public class Injector {
 		this.dependencies.put(ClassPath.class, ClassScanner::getClassPath);
 		this.dependencies.put(Injector.class, () -> this);
 		
-		injectStaticFields();
-	}
-	
-	/**
-	 * Scans all classes on the class path and, for each
-	 * class found, injects dependencies into static
-	 * fields annotated by the <code>@Inject</code> annotation. 
-	 */
-	private void injectStaticFields(){
-		ClassPath classpath = ClassScanner.getClassPath();
-		for(Class<?> c : classpath.getClasses()){
-			scanFields(c);
-		}
-	}
-	
-	/**
-	 * Scans all fields on a class and, for each eligible field,
-	 * sets it's value to an appropriate dependency.
-	 * @param c The class to scan.
-	 */
-	private void scanFields(Class<?> c){
-		for(Field f : c.getDeclaredFields()){
-			if(tools.isInjectable(f, true)) injectIntoField(f, null);
-		}
+		manager.injectStaticFields();
 	}
 	
 	/**
@@ -100,7 +77,7 @@ public class Injector {
 	 * @param o The object instance to inject into. If used
 	 * for static dependencies, this should be null.
 	 */
-	private void injectIntoField(Field f, Object o){
+	void injectIntoField(Field f, Object o){
 		try{
 			Object dependency = getDependency(f.getType());
 			f.setAccessible(true);
@@ -116,7 +93,7 @@ public class Injector {
 	 * @param classes An array of classes
 	 * @return An array of dependencies
 	 */
-	public Object[] getDependencies(Class<?>[] classes){
+	Object[] getDependencies(Class<?>[] classes){
 		Object[] params = new Object[classes.length];
 		for(int i = 0; i < classes.length; i++){
 			params[i] = getDependency(classes[i]);
@@ -171,17 +148,11 @@ public class Injector {
 	 * @return An instance of the Class c
 	 */
 	public <T> T newInstance(Class<T> c) {
-		T instance = null;
-		Constructor<?> construct = tools.getConstructor(c);
-		
-		if(construct == null){
-			instance = tools.construct(c);
-		}
-		else {
-			Class<?>[] classes = construct.getParameterTypes();
-			Object[] params = getDependencies(classes);
-			instance =  tools.construct(c, params);
-		}
+		Class<?>[] classes = tools.getConstructorTypes(c);
+
+		Object[] params = getDependencies(classes);
+		T instance =  tools.construct(c, params);
+				
 		injectDependencies(instance);
 		return instance;
 	}

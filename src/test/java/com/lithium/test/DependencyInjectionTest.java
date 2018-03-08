@@ -1,9 +1,6 @@
 package com.lithium.test;
 
-import java.io.Serializable;
-
 import com.lithium.inject.Injector;
-import com.lithium.inject.config.Inject;
 
 public class DependencyInjectionTest {
 

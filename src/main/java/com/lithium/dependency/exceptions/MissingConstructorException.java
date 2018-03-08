@@ -1,5 +1,12 @@
 package com.lithium.dependency.exceptions;
 
+/**
+ * An Exception of the case when a constructor
+ * (either default or injected) cannot be found 
+ * for a given dependency.
+ * 
+ * @author Luke Stevens
+ */
 public class MissingConstructorException extends DependencyCreationException {
 
 	private static final long serialVersionUID = -5900761707743382688L;

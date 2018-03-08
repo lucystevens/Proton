@@ -1,4 +1,4 @@
-package com.lithium.inject;
+package com.lithium.inject.exceptions;
 
 /**
  * An exception to be thrown if errors
