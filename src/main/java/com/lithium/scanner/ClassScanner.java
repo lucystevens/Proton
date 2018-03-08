@@ -81,7 +81,7 @@ public class ClassScanner {
 	 */
 	private static void loadClasses(URL url) throws IOException{
 		String path = URLDecoder.decode(url.getPath().replace("/", "\\"), "UTF-8");
-		if(path.startsWith("\\")) path = path.substring(1);
+		if(path.matches("\\\\[A-Z]:.*")) path = path.substring(1);
 		System.out.println(path);
 		if(isJar()) loadClassesJar();
 		else{
