@@ -140,6 +140,7 @@ public class ClassScanner {
 				
 				// Formats the path name to load it as a class
 				String name = path.replace(root, "").replaceAll("\\\\|\\/", ".").replace(".class", "");
+				System.out.println(name);
 				
 				/*
 				 * Do not initialise Injector or DependencyManager as these will
