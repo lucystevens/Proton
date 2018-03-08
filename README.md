@@ -1,4 +1,4 @@
-# Proton (alpha)
+# Proton (alpha) &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton)
 
 Proton is a simple, lightweight dependency injection framework for Java.
 It has been designed to be used for smaller projects where all the complexities, features, and additional dependencies of the Spring Framework are not needed.
