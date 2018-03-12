@@ -129,9 +129,7 @@ public class Injector {
 		Supplier<Object> instance = dependencies.get(c);
 		if(instance == null) throw new MissingDependencyException(c);
 		
-		Object o = instance.get();
-		if(o instanceof InjectionException) throw (InjectionException) o;
-		else return c.cast(o);
+		return c.cast(instance.get());
 	}
 	
 	/**

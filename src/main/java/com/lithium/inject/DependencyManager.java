@@ -175,7 +175,7 @@ public class DependencyManager {
 		if(exists && concrete) throw new DependencyCreationException("Dependency already exists for class.", dep);
 		
 		// If it exists, but isn't concrete, store an exception to throw if retrieval is attempted
-		else if(exists) dependencies.put(dep, () -> new AmbiguousDependencyException(dep));
+		else if(exists) dependencies.put(dep, () -> { throw new AmbiguousDependencyException(dep); });
 		
 		// Otherwise store dependency and supplier
 		else dependencies.put(dep, instance);
