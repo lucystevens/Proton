@@ -44,7 +44,7 @@ public class Injector {
 	 * will achieve the same results, but this method makes the
 	 * intention more obvious.
 	 */
-	public static void init(){};
+	public static void init(){ /* Doesn't do anything other than force loading of the class */ };
 	
 	private Map<Class<?>, Supplier<Object>> dependencies = new HashMap<>();
 	private InjectionTools tools = new InjectionTools();

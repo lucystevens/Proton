@@ -33,6 +33,8 @@ public class ClassScanner {
 		return INSTANCE;
 	}
 	
+	private ClassScanner(){ /* Private constructor for utility class */ }
+	
 	/**
 	 * Initialises the single instance of ClassPath on load.
 	 * @return An instance of ClassPath containing a list of 

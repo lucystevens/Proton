@@ -3,6 +3,7 @@ package com.lithium.inject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,20 +103,29 @@ public class DependencyManager {
 	 * and injects necessary dependencies into them.
 	 */
 	private void loadDependencies(){
+		List<Class<?>> loadedClasses = new ArrayList<>();
 		
 		// Loops through all dependencies left to load
-		for(int i = 0; i < classesToLoad.size(); i++){
-			Class<?> dep = classesToLoad.get(i);
+		for(Class<?> dep : classesToLoad){
 			
-			// If all sub dependencies are loaded, load dependency and remove from list
+			// If all sub dependencies are loaded, load dependency
+			// and add to list to remove
 			if(subDependenciesLoaded(dep)){
 				loadDependency(dep);
-				classesToLoad.remove(i--);
+				loadedClasses.add(dep);
 			}
 			
 			// Otherwise check the sub dependencies are valid
 			else validateSubDependencies(dep);
 		}
+		
+		// If no classes have been loaded, dependency injection is stuck in a loop
+		if(loadedClasses.isEmpty()) {
+			throw new DependencyCreationException("Dependency loop detected. Failing dependencies: " + classesToLoad);
+		}
+		
+		// Remove loaded classes
+		classesToLoad.removeAll(loadedClasses);
 		
 		// If there are no more dependencies to load return the current map
 		if(!classesToLoad.isEmpty()) loadDependencies();
@@ -214,7 +224,6 @@ public class DependencyManager {
 	 * fields annotated by the <code>@Inject</code> annotation. 
 	 */
 	void injectStaticFields(){
-		ClassPath classpath = ClassScanner.getClassPath();
 		for(Class<?> c : classpath.getClasses()){
 			scanFields(c);
 		}
