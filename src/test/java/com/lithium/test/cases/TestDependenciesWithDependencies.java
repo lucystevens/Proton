@@ -6,14 +6,17 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.lithium.inject.Injector;
+import com.lithium.inject.config.Inject;
 import com.lithium.test.dependencies.DependencyWithDependencies;
 import com.lithium.test.dependencies.MultipleDependency;
 import com.lithium.test.dependencies.SingletonDependency;
 
 public class TestDependenciesWithDependencies {
 	
-	Injector inject = Injector.getInstance();
-	DependencyWithDependencies d = inject.getDependency(DependencyWithDependencies.class);
+	@Inject
+	static Injector injector;
+	
+	DependencyWithDependencies d = injector.getDependency(DependencyWithDependencies.class);
 	
 	@Test
 	public void testSingletonDependencyInField(){
@@ -41,6 +44,12 @@ public class TestDependenciesWithDependencies {
 		MultipleDependency m = d.multipleConstructorTest();
 		assertNotNull("Dependency not injected", m);
 		assertTrue("New instance of dependency not created", m.isUniqueInstance());
+	}
+	
+	@Test
+	public void testExternalDependency(){
+		int i = d.getInteger();
+		assertTrue("Integer not injected", i == 3);
 	}
 
 }

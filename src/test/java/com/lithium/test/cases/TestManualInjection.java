@@ -6,18 +6,20 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.lithium.inject.Injector;
+import com.lithium.inject.config.Inject;
 import com.lithium.test.dependencies.MultipleDependency;
 import com.lithium.test.dependencies.SingletonDependency;
 import com.lithium.test.objects.SomeObject;
 
 public class TestManualInjection {
 	
-	Injector inject = Injector.getInstance();
+	@Inject
+	static Injector injector;
 	
 	@Test
 	public void testSingletonDependency(){
 		SomeObject so = new SomeObject();
-		inject.injectDependencies(so);
+		injector.injectDependencies(so);
 		
 		SingletonDependency s = so.singletonFieldTest();
 		assertNotNull("Dependency not injected", s);
@@ -27,7 +29,7 @@ public class TestManualInjection {
 	@Test
 	public void testMultipleDependency(){
 		SomeObject so = new SomeObject();
-		inject.injectDependencies(so);
+		injector.injectDependencies(so);
 		
 		MultipleDependency m = so.multipleFieldTest();
 		assertNotNull("Dependency not injected", m);

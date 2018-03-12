@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import com.lithium.test.cases.TestClassPath;
+import com.lithium.test.cases.TestConfiguration;
 import com.lithium.test.cases.TestDependenciesWithDependencies;
 import com.lithium.test.cases.TestExtensionInjection;
 import com.lithium.test.cases.TestInjectionExceptions;
@@ -19,7 +20,8 @@ import com.lithium.test.cases.TestStaticInjection;
 	TestDependenciesWithDependencies.class,
 	TestExtensionInjection.class,
 	TestInjectionExceptions.class,
-	TestInjectorManagedConstruction.class
+	TestInjectorManagedConstruction.class,
+	TestConfiguration.class
 	})
 public class InjectionTestSuite {
 

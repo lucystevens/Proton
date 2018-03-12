@@ -6,14 +6,17 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.lithium.inject.Injector;
+import com.lithium.inject.config.Inject;
 import com.lithium.test.dependencies.MultipleDependency;
 import com.lithium.test.dependencies.SingletonDependency;
 import com.lithium.test.objects.InjectorManagedObject;
 
 public class TestInjectorManagedConstruction {
 	
-	Injector inject = Injector.getInstance();
-	InjectorManagedObject imo = inject.newInstance(InjectorManagedObject.class);
+	@Inject
+	static Injector injector;
+	
+	InjectorManagedObject imo = injector.newInstance(InjectorManagedObject.class);
 	
 	@Test
 	public void testSingletonDependencyInField(){

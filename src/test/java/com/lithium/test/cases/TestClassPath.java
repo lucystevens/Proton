@@ -18,6 +18,7 @@ import static org.junit.Assert.*;
 public class TestClassPath {
 	
 	ClassPath classpath = ClassScanner.getClassPath();
+	Injector injector = Injector.getInstance();
 
 	@Test
 	public void filterByAnnotation(){

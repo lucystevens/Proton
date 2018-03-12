@@ -6,13 +6,16 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.lithium.inject.Injector;
+import com.lithium.inject.config.Inject;
 import com.lithium.test.dependencies.MultipleDependency;
 import com.lithium.test.dependencies.SingletonDependency;
 import com.lithium.test.objects.SomeInjectableObject;
 
 public class TestExtensionInjection {
 	
-	Injector inject = Injector.getInstance();
+	@Inject
+	static Injector injector;
+	
 	SomeInjectableObject sio = new SomeInjectableObject();
 	
 	@Test

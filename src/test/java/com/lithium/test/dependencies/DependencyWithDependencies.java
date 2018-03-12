@@ -6,6 +6,9 @@ import com.lithium.inject.config.Inject;
 
 @Dependency(type = InstanceType.MULTIPLE)
 public class DependencyWithDependencies extends BlankSuperClass{
+	
+	@Inject
+	private Integer integer;
 
 	@Inject
 	private SingletonDependency singletonField;
@@ -39,6 +42,8 @@ public class DependencyWithDependencies extends BlankSuperClass{
 		return multipleConstructor;
 	}
 	
-	
+	public int getInteger(){
+		return integer;
+	}
 	
 }
