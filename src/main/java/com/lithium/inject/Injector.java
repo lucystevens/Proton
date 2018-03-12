@@ -25,6 +25,7 @@ import com.lithium.scanner.ClassScanner;
  */
 public class Injector {
 	
+	public static final String ROOT_QUALIFIER = "root";
 	private static final Injector INSTANCE = new Injector();
 	
 	/**
@@ -33,6 +34,17 @@ public class Injector {
 	public static Injector getInstance(){
 		return INSTANCE;
 	}
+	
+	/**
+	 * Used to load the Injector class and initialise
+	 * the Injector singleton instance.<br>
+	 * 
+	 * Calling {@link Injector#getInstance()} or 
+	 * <code>Class.forName("com.lithium.inject.Injector")</code>
+	 * will achieve the same results, but this method makes the
+	 * intention more obvious.
+	 */
+	public static void init(){};
 	
 	private Map<Class<?>, Supplier<Object>> dependencies = new HashMap<>();
 	private InjectionTools tools = new InjectionTools();
@@ -44,7 +56,7 @@ public class Injector {
 	 */
 	private Injector(){
 		DependencyManager manager = new DependencyManager(this);
-		this.dependencies = manager.loadDependencies();
+		this.dependencies = manager.loadAllDependencies();
 		
 		this.dependencies.put(ClassPath.class, ClassScanner::getClassPath);
 		this.dependencies.put(Injector.class, () -> this);

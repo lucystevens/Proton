@@ -158,10 +158,10 @@ public class ClassScanner {
 				String name = path.replaceAll("\\\\|\\/", ".").replace(root, "").replace(".class", "");
 				
 				/*
-				 * Do not initialise Injector or DependencyManager as these will
-				 * try and retrieve the partially initialised ClassPath and fail
+				 * Do not initialise Injector as this will try and
+				 * retrieve the partially initialised ClassPath and fail
 				 */
-				if(!name.equals("com.lithium.inject.DependencyManager") && !name.equals("com.lithium.inject.Injector")){
+				if(!name.equals("com.lithium.inject.Injector")){
 					Class<?> c = Class.forName(name);
 					classes.add(c);
 				}

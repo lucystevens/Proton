@@ -1,11 +1,15 @@
 package com.lithium.inject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.lithium.configuration.Configuration;
+import com.lithium.configuration.ConfigurationException;
 import com.lithium.dependency.Dependency;
 import com.lithium.dependency.InstanceType;
 import com.lithium.dependency.exceptions.AmbiguousDependencyException;
@@ -23,7 +27,8 @@ import com.lithium.scanner.ClassScanner;
 public class DependencyManager {
 	
 	private final Map<Class<?>, Supplier<Object>> dependencies = new HashMap<>();
-	private final List<Class<?>> classesToLoad = ClassScanner.getClassPath().getClassesWithAnnotation(Dependency.class);
+	private final ClassPath classpath = ClassScanner.getClassPath();
+	private final List<Class<?>> classesToLoad = classpath.getClassesWithAnnotation(Dependency.class);
 	private InjectionTools tools = new InjectionTools();
 	private Injector injector;
 	
@@ -36,12 +41,67 @@ public class DependencyManager {
 	}
 	
 	/**
-	 * Loads all classesToLoad marked as dependencies from the classpath
-	 * and injects necessary dependencies into them.
-	 * @return A Map of dependency classesToLoad to functions that 
+	 * Loads all dependencies, both external (from configuration)
+	 * and internal (from classpath)
+	 * @return A Map of dependency classes to functions that 
 	 * supply their objects.
 	 */
-	Map<Class<?>, Supplier<Object>> loadDependencies(){
+	Map<Class<?>, Supplier<Object>> loadAllDependencies(){
+		loadExternalDependencies();
+		loadDependencies();
+		return dependencies;
+	}
+	
+	/**
+	 * Loads all external dependencies defined in
+	 * <code>@Configuration</code>-annotated classes.
+	 */
+	private void loadExternalDependencies(){
+		List<Class<?>> configs = classpath.getClassesWithAnnotation(Configuration.class);
+		configs.forEach(this::loadExternalDependencies);
+	}
+	
+	/**
+	 * Loads all external dependencies from a single
+	 * configuration class.
+	 * @param configClass The configuration class to load external
+	 * dependencies from.
+	 */
+	private void loadExternalDependencies(Class<?> configClass){
+		if(configClass.isInterface()) {
+			throw new ConfigurationException("The configuration class must not be abstract or an interface", configClass);
+		}
+		
+		Object config = tools.construct(configClass);
+				
+		for(Method m : configClass.getDeclaredMethods()){
+			loadExternalDependency(config, m);
+		}
+	}
+	
+	/**
+	 * Loads a single external dependency from a
+	 * method in a configuration class.
+	 * @param parent A concrete instance of the configuration class.
+	 * @param m The method to use to supply an instance of the dependency.
+	 */
+	private void loadExternalDependency(Object parent, Method m){
+		if(m.getParameterTypes().length != 0){
+			throw new ConfigurationException("Configuration methods must not have any parameters.", parent.getClass());
+		}
+		
+		Class<?> depClass = m.getReturnType();
+		Object instance = Modifier.isStatic(m.getModifiers())? null : parent;
+		Supplier<Object> supplier = () -> tools.invokeMethod(instance, m);
+		
+		loadDependency(depClass, supplier);
+	}
+	
+	/**
+	 * Loads all classesToLoad marked as dependencies from the classpath
+	 * and injects necessary dependencies into them.
+	 */
+	private void loadDependencies(){
 		
 		// Loops through all dependencies left to load
 		for(int i = 0; i < classesToLoad.size(); i++){
@@ -58,8 +118,7 @@ public class DependencyManager {
 		}
 		
 		// If there are no more dependencies to load return the current map
-		if(!classesToLoad.isEmpty()) return loadDependencies();
-		else return dependencies;
+		if(!classesToLoad.isEmpty()) loadDependencies();
 	}
 	
 	/**
@@ -71,7 +130,10 @@ public class DependencyManager {
 	private void loadDependency(Class<?> dep){
 		InstanceType type = dep.getAnnotation(Dependency.class).type();
 		Supplier<Object> instance = injector.getSupplier(dep, type);
-		
+		loadDependency(dep, instance);
+	}
+	
+	private void loadDependency(Class<?> dep, Supplier<Object> instance){	
 		// Load concrete dependency class
 		loadDependency(dep, instance, true);
 		
@@ -140,7 +202,7 @@ public class DependencyManager {
 		List<Class<?>> subDependencies = tools.getSubDependencies(parent);
 		
 		for (Class<?> c : subDependencies) {
-			if(!classesToLoad.contains(c)) missing.append(c.getSimpleName() + ", ");
+			if(!classesToLoad.contains(c) && !dependencies.containsKey(c)) missing.append(c.getSimpleName() + ", ");
 		}
 		
 		if(missing.length() > 23) throw new DependencyCreationException(missing.substring(0, missing.length() - 2), parent);

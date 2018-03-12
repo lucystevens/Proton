@@ -2,6 +2,8 @@ package com.lithium.inject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,6 +127,23 @@ public class InjectionTools {
 			superclass = superclass.getSuperclass();
 		}
 		return superClasses;
+	}
+	
+	/**
+	 * Invokes a method using an object instance and arguments.
+	 * @param o The object instance to call the method on.
+	 * If the method is static then this should be null.
+	 * @param m The method to invoke.
+	 * @param args The arguments to pass to the method.
+	 * @return The Object returned by the method invoked.
+	 */
+	Object invokeMethod(Object o, Method m, Object...args){
+		try{
+			m.setAccessible(true);
+			return m.invoke(o, args);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new DependencyCreationException("Root cause: " + e.getMessage(), o.getClass());
+		}
 	}
 
 }
