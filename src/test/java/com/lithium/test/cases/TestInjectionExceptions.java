@@ -10,8 +10,6 @@ import com.lithium.dependency.exceptions.MissingConstructorException;
 import com.lithium.dependency.exceptions.MissingDependencyException;
 import com.lithium.inject.Injector;
 import com.lithium.inject.config.Inject;
-import com.lithium.inject.exceptions.InjectionException;
-import com.lithium.test.objects.invalid.InaccessbileInjectionObject;
 import com.lithium.test.objects.invalid.InvalidConstructorObject;
 import com.lithium.test.objects.invalid.InvalidInjectionObject;
 import com.lithium.test.objects.invalid.MultipleConstructorObject;
@@ -24,11 +22,6 @@ public class TestInjectionExceptions {
 	@Test(expected = AmbiguousDependencyException.class)
 	public void retrieveAmbiguousDependency(){
 		injector.getDependency(Serializable.class);
-	}
-	
-	@Test(expected = InjectionException.class)
-	public void injectInaccessibleDependency(){
-		injector.newInstance(InaccessbileInjectionObject.class);
 	}
 	
 	@Test(expected = MissingDependencyException.class)

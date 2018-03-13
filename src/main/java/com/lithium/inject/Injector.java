@@ -1,13 +1,20 @@
 package com.lithium.inject;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import com.lithium.dependency.InstanceType;
+import com.lithium.dependency.exceptions.AmbiguousDependencyException;
 import com.lithium.dependency.exceptions.DependencyCreationException;
 import com.lithium.dependency.exceptions.MissingDependencyException;
+import com.lithium.dependency.loaders.DependencyLoader;
+import com.lithium.dependency.loaders.ExternalDependencyLoader;
+import com.lithium.dependency.loaders.InternalDependencyLoader;
+import com.lithium.dependency.suppliers.DependencySupplier;
 import com.lithium.inject.config.InjectableObject;
 import com.lithium.inject.exceptions.InjectionException;
 import com.lithium.scanner.ClassPath;
@@ -46,8 +53,9 @@ public class Injector {
 	 */
 	public static void init(){ /* Doesn't do anything other than force loading of the class */ };
 	
-	private Map<Class<?>, Supplier<Object>> dependencies = new HashMap<>();
-	private InjectionTools tools = new InjectionTools();
+	private final Map<Class<?>, Supplier<Object>> dependencies = new HashMap<>();
+	private final InjectionTools tools = new InjectionTools();
+	private final ClassPath classpath = ClassScanner.getClassPath();
 	
 	/**
 	 * Creates the single instance of this Injector,
@@ -55,30 +63,124 @@ public class Injector {
 	 * injected static dependencies where appropriate.
 	 */
 	private Injector(){
-		DependencyManager manager = new DependencyManager(this);
-		this.dependencies = manager.loadAllDependencies();
+		loadAllDependencies(new ExternalDependencyLoader(), new InternalDependencyLoader());
 		
 		this.dependencies.put(ClassPath.class, ClassScanner::getClassPath);
 		this.dependencies.put(Injector.class, () -> this);
 		
-		manager.injectStaticFields();
+		injectStaticFields();
+	}
+	
+	private void loadAllDependencies(DependencyLoader...loaders){
+		List<DependencySupplier> toInitialise = new ArrayList<>();
+		for (DependencyLoader dependencyLoader : loaders) {
+			toInitialise.addAll(dependencyLoader.getDependencies());
+		}
+		loadDependencies(toInitialise);
 	}
 	
 	/**
-	 * Creates the supplier for a dependency. 
-	 * @param c The class to create the supplier for
-	 * @param type The InstanceType; e.g. whether an existing instance
-	 * should always be supplied, or a new instance created
-	 * @return A lambda function that either creates a new instance
-	 * or returns the existing singleton instance when called.
+	 * Loads all classesToLoad marked as dependencies from the classpath
+	 * and injects necessary dependencies into them.
 	 */
-	Supplier<Object> getSupplier(Class<?> c, InstanceType type){
-		if(type == InstanceType.SINGLETON){
-			Object instance = newInstance(c);
-			return () -> instance;
+	private void loadDependencies(List<DependencySupplier> toInitialise){
+		List<DependencySupplier> loadedSuppliers = new ArrayList<>();
+		
+		// Loops through all dependencies left to load
+		for(DependencySupplier dep : toInitialise){
+			
+			// If all sub dependencies are loaded, load dependency
+			// and add to list to remove
+			if(dep.subDependenciesLoaded(this)){
+				loadDependency(dep);
+				loadedSuppliers.add(dep);
+			}
+			
+			// Otherwise check the sub dependencies are valid
+			else dep.validateSubDependencies(toInitialise, this);
 		}
-		else {
-			return () -> newInstance(c);
+		
+		// If no classes have been loaded, dependency injection is stuck in a loop
+		if(loadedSuppliers.isEmpty()) {
+			throw new DependencyCreationException("Dependency loop detected. Failing dependencies: " + toInitialise);
+		}
+		
+		// Remove loaded classes
+		toInitialise.removeAll(loadedSuppliers);
+		
+		// If there are no more dependencies to load return the current map
+		if(!toInitialise.isEmpty()) loadDependencies(toInitialise);
+	}
+	
+	/**
+	 * Loads the supplier for a dependency class and stores
+	 * in the dependency map for the class and all interfaces and superclasses.
+	 * @param c The class to load as a dependency. Must be
+	 * annotated with <code>@Dependency</code>
+	 */
+	private void loadDependency(DependencySupplier dep){
+		Supplier<Object> instance = dep.generateSupplier(this);
+		loadDependency(dep.getDependencyClass(), instance);
+	}
+	
+	private void loadDependency(Class<?> dep, Supplier<Object> instance){	
+		// Load concrete dependency class
+		loadDependency(dep, instance, true);
+		
+		// Load superclasses
+		for(Class<?> superclass : tools.getSuperClasses(dep)){
+			loadDependency(superclass, instance, false);
+		}
+		
+		// Load implementing interfaces
+		for(Class<?> iface : dep.getInterfaces()){
+			loadDependency(iface, instance, false);
+		}
+	}
+	
+	/**
+	 * Loads a dependency into the dependency map
+	 * @param d The class to store the dependency under. This may be 
+	 * the actual dependency class, or any interface/superclass it implements.
+	 * @param instance The supplier to use to get an instance of this
+	 * dependency.
+	 * @param concrete Whether this is the concrete class or an interface/superclass
+	 * @throws DependencyCreationException If a dependency already exists
+	 * for the specified concrete class
+	 */
+	private void loadDependency(Class<?> dep, Supplier<Object> instance, boolean concrete){
+		boolean exists = dependencies.containsKey(dep);
+		
+		// If the concrete dependency already exists, throw an exception
+		if(exists && concrete) throw new DependencyCreationException("Dependency already exists for class.", dep);
+		
+		// If it exists, but isn't concrete, store an exception to throw if retrieval is attempted
+		else if(exists) dependencies.put(dep, () -> { throw new AmbiguousDependencyException(dep); });
+		
+		// Otherwise store dependency and supplier
+		else dependencies.put(dep, instance);
+		
+	}
+	
+	/**
+	 * Scans all classes on the class path and, for each
+	 * class found, injects dependencies into static
+	 * fields annotated by the <code>@Inject</code> annotation. 
+	 */
+	private void injectStaticFields(){
+		for(Class<?> c : classpath.getClasses()){
+			scanFields(c);
+		}
+	}
+	
+	/**
+	 * Scans all fields on a class and, for each eligible field,
+	 * sets it's value to an appropriate dependency.
+	 * @param c The class to scan.
+	 */
+	private void scanFields(Class<?> c){
+		for(Field f : c.getDeclaredFields()){
+			if(tools.isInjectable(f, true)) injectIntoField(f, null);
 		}
 	}
 	
@@ -89,7 +191,7 @@ public class Injector {
 	 * @param o The object instance to inject into. If used
 	 * for static dependencies, this should be null.
 	 */
-	void injectIntoField(Field f, Object o){
+	private void injectIntoField(Field f, Object o){
 		try{
 			Object dependency = getDependency(f.getType());
 			f.setAccessible(true);
@@ -105,7 +207,7 @@ public class Injector {
 	 * @param classes An array of classes
 	 * @return An array of dependencies
 	 */
-	Object[] getDependencies(Class<?>[] classes){
+	public Object[] getDependencies(Class<?>[] classes){
 		Object[] params = new Object[classes.length];
 		for(int i = 0; i < classes.length; i++){
 			params[i] = getDependency(classes[i]);
@@ -165,6 +267,10 @@ public class Injector {
 				
 		injectDependencies(instance);
 		return instance;
+	}
+	
+	public boolean hasDependency(Class<?> c){
+		return dependencies.containsKey(c);
 	}
 
 }

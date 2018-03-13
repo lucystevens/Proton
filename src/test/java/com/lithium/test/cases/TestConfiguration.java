@@ -27,4 +27,10 @@ public class TestConfiguration {
 		assertFalse("Stored list is empty", list.isEmpty());
 		assertTrue("List was not loaded from configuration", list.get(0).equals("first entry"));
 	}
+	
+	@Test
+	public void testString(){
+		String s = injector.getDependency(String.class);
+		assertTrue("String not injected correctly", s.equals("The integer dependency is 3"));
+	}
 }

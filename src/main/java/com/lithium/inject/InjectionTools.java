@@ -20,9 +20,6 @@ import com.lithium.inject.config.Inject;
  */
 public class InjectionTools {
 	
-	// Restrict access to package
-	InjectionTools(){}
-	
 	/**
 	 * Determines whether a field is injectable e.g.
 	 * whether a dependency should be injected into it.
@@ -32,7 +29,7 @@ public class InjectionTools {
 	 * injectable methods, and vice-versa
 	 * @return True if injectable, false if not.
 	 */
-	boolean isInjectable(Field f, boolean checkStatic){
+	public boolean isInjectable(Field f, boolean checkStatic){
 		return f.getAnnotation(Inject.class) != null && (checkStatic == Modifier.isStatic(f.getModifiers()));
 	}
 	
@@ -45,7 +42,7 @@ public class InjectionTools {
 	 * @throws DependencyCreationException If there are multiple 
 	 * constructors annotated with <code>@Inject</code>
 	 */
-	Class<?>[] getConstructorTypes(Class<?> c){
+	public Class<?>[] getConstructorTypes(Class<?> c){
 		Class<?>[] types = {};
 		
 		for(Constructor<?> con : c.getDeclaredConstructors()){
@@ -67,7 +64,7 @@ public class InjectionTools {
 	 * @throws DependencyCreationException If there is
 	 * not constructor matching the supplied parameters.
 	 */
-	<T> T construct(Class<T> c, Object...params){
+	public <T> T construct(Class<T> c, Object...params){
 		Class<?>[] classes = argsToClasses(params);
 		try {
 			Constructor<T> con = c.getDeclaredConstructor(classes);
@@ -85,7 +82,7 @@ public class InjectionTools {
 	 * @param args An array of arguments to be passed to a method
 	 * @return An array of classes of the original arguments.
 	 */
-	Class<?>[] argsToClasses(Object...args){
+	private Class<?>[] argsToClasses(Object...args){
 		Class<?>[] classes = new Class<?>[args.length];
 		for(int i = 0; i<args.length; i++){
 			classes[i] = args[i].getClass();
@@ -99,7 +96,7 @@ public class InjectionTools {
 	 * @return A List of all sub dependencies within a parent
 	 * dependency
 	 */
-	List<Class<?>> getSubDependencies(Class<?> parent){
+	public List<Class<?>> getSubDependencies(Class<?> parent){
 		List<Class<?>> subDependencies = new ArrayList<>();
 		
 		// Get field sub dependencies
@@ -119,7 +116,7 @@ public class InjectionTools {
 	 * @param parent The class to get all superclasses for
 	 * @return A List of superclasses for the given class
 	 */
-	List<Class<?>> getSuperClasses(Class<?> parent){
+	public List<Class<?>> getSuperClasses(Class<?> parent){
 		List<Class<?>> superClasses = new ArrayList<>();
 		Class<?> superclass = parent.getSuperclass();
 		while(superclass != null){
@@ -137,7 +134,7 @@ public class InjectionTools {
 	 * @param args The arguments to pass to the method.
 	 * @return The Object returned by the method invoked.
 	 */
-	Object invokeMethod(Object o, Method m, Object...args){
+	public Object invokeMethod(Object o, Method m, Object...args){
 		try{
 			m.setAccessible(true);
 			return m.invoke(o, args);
