@@ -1,4 +1,4 @@
-# Proton (alpha) &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton)
+# Proton (alpha) &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton) &emsp; ![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=sqale_rating) &emsp; ![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=bugs)
 
 Proton is a simple, lightweight dependency injection framework for Java.
 It has been designed to be used for smaller projects where all the complexities, features, and additional dependencies of the Spring Framework are not needed.
@@ -56,12 +56,40 @@ This can be done by annotating the dependency fields with `@Inject` as shown abo
 		SomeObject so = new SomeObject();
 		injector.injectDependencies(so);
 		
+	
 		
 ### Defining dependencies
 
 Dependencies must be defined prior to them being injected into objects.
 This is done by annotating them using `@Dependency` with an `InstanceType` denoting whether only a single instance of the dependency should exist, or whether a new one should be created every time it needs to be injected. 
 Dependencies are mapped for not only their concrete class, but also their superclasses and any interfaces they implement. 
+
+### Defining third-party dependency configuration
+
+For dependencies from third party sources, that you can't simply annotate with `@Dependency`, classes annotated with `@Configuration` should be defined.
+Each method in each of these classes should represent the code to be called when injecting an instance of the dependency in question.
+The code below, for example, would register dependencies for the `Integer`, `List`, and `String` classes;
+
+	@Configuration
+	public class Config {
+		
+		Integer integerDependency(){
+			return 3;
+		}
+	
+		List<String> defaultList(){
+			List<String> list = new ArrayList<>();
+			list.add("first entry");
+			return list;
+		}
+		
+		String complexDep(DependencyWithDependencies d){
+			return "The integer dependency is " + d.getInteger();
+		}
+		
+	}
+	
+As can be seen above, these methods can receive other dependencies as params if necessary, and precautions should be taken to avoid circular dependencies.
 
 #### Retrieving dependencies
 
