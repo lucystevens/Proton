@@ -5,15 +5,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 import com.lithium.dependency.exceptions.DependencyCreationException;
 import com.lithium.dependency.exceptions.MissingConstructorException;
+import com.lithium.dependency.suppliers.DependencySupplier;
 import com.lithium.inject.config.Inject;
 
 /**
  * A tools class to separate out stateless methods
- * from the {@link Injector} and {@link DependencyManager}.
+ * from the {@link Injector}.
  * 
  * @author Luke Stevens
  *
@@ -89,43 +89,7 @@ public class InjectionTools {
 		}
 		return classes;
 	}
-	
-	/**
-	 * Gets all sub dependencies from a parent dependency
-	 * @param parent The parent dependency class
-	 * @return A List of all sub dependencies within a parent
-	 * dependency
-	 */
-	public List<Class<?>> getSubDependencies(Class<?> parent){
-		List<Class<?>> subDependencies = new ArrayList<>();
-		
-		// Get field sub dependencies
-		for(Field f : parent.getDeclaredFields()){
-			if(isInjectable(f, false)) subDependencies.add(f.getType());
-		}
-		
-		// Get constructor sub dependencies
-		for(Class<?> c : getConstructorTypes(parent)){
-			subDependencies.add(c);
-		}
-		return subDependencies;
-	}
-	
-	/**
-	 * Gets all superclasses for a given class
-	 * @param parent The class to get all superclasses for
-	 * @return A List of superclasses for the given class
-	 */
-	public List<Class<?>> getSuperClasses(Class<?> parent){
-		List<Class<?>> superClasses = new ArrayList<>();
-		Class<?> superclass = parent.getSuperclass();
-		while(superclass != null){
-			superClasses.add(superclass);
-			superclass = superclass.getSuperclass();
-		}
-		return superClasses;
-	}
-	
+
 	/**
 	 * Invokes a method using an object instance and arguments.
 	 * @param o The object instance to call the method on.
@@ -141,6 +105,20 @@ public class InjectionTools {
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new DependencyCreationException("Root cause: " + e.getMessage(), o.getClass());
 		}
+	}
+	
+	/**
+	 * Determines if a DependencySupplier corresponding to a
+	 * class is in a list of dependency suppliers to be loaded.
+	 * @param c The class
+	 * @param toInit The list of Dependency Suppliers to be initialised
+	 * @return True if in the list, false if not.
+	 */
+	public boolean toBeLoaded(Class<?> c, List<DependencySupplier> toInit){
+		for(DependencySupplier dep : toInit){
+			if(dep.getDependencyClass().equals(c)) return true;
+		}
+		return false;
 	}
 
 }

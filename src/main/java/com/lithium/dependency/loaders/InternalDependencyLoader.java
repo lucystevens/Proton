@@ -9,6 +9,12 @@ import com.lithium.dependency.suppliers.DependencySupplier;
 import com.lithium.scanner.ClassPath;
 import com.lithium.scanner.ClassScanner;
 
+/**
+ * A Dependency Loader that loads classes annotated
+ * with <code>@</code>{@link Dependency} as dependencies.
+ * 
+ * @author Luke Stevens
+ */
 public class InternalDependencyLoader implements DependencyLoader {
 	
 	private final ClassPath classpath = ClassScanner.getClassPath();

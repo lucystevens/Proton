@@ -1,11 +1,16 @@
 package com.lithium.dependency.suppliers;
 
-import java.util.List;
 import java.util.function.Supplier;
 
-import com.lithium.inject.InjectionTools;
+import com.lithium.dependency.InstanceType;
 import com.lithium.inject.Injector;
 
+/**
+ * A DependencySupplier implementation for dependencies
+ * with an {@link InstanceType} of MULTIPLE.
+ * 
+ * @author Luke Stevens
+ */
 public class MultipleInstanceSupplier extends DependencySupplier {
 
 	public MultipleInstanceSupplier(Class<?> dependency) {
@@ -13,17 +18,8 @@ public class MultipleInstanceSupplier extends DependencySupplier {
 	}
 
 	@Override
-	List<Class<?>> loadSubDependencies() {
-		InjectionTools tools = new InjectionTools();
-		return tools.getSubDependencies(dependency);
-	}
-
-	@Override
 	public Supplier<Object> generateSupplier(Injector injector) {
-		if(supplier == null){
-			supplier = () -> injector.newInstance(dependency);
-		}
-		return supplier;
+		return () -> injector.newInstance(dependency);
 	}
 
 }

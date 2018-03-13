@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.lithium.dependency.InstanceType;
+import com.lithium.configuration.Configuration;
 import com.lithium.dependency.exceptions.AmbiguousDependencyException;
 import com.lithium.dependency.exceptions.DependencyCreationException;
 import com.lithium.dependency.exceptions.MissingDependencyException;
@@ -71,19 +71,26 @@ public class Injector {
 		injectStaticFields();
 	}
 	
+	/**
+	 * Loads all dependencies using the provided dependency
+	 * loaders.
+	 * @param loaders An array of dependency loaders used to 
+	 * load dependencies from different sources.
+	 */
 	private void loadAllDependencies(DependencyLoader...loaders){
 		List<DependencySupplier> toInitialise = new ArrayList<>();
 		for (DependencyLoader dependencyLoader : loaders) {
 			toInitialise.addAll(dependencyLoader.getDependencies());
 		}
-		loadDependencies(toInitialise);
+		initialiseDependencies(toInitialise);
 	}
 	
 	/**
-	 * Loads all classesToLoad marked as dependencies from the classpath
-	 * and injects necessary dependencies into them.
+	 * Recursively initialises all loaded dependencies until
+	 * there are no more to intialise.
+	 * @param toInitialise A List of loaded DependencySuppliers to initalise.
 	 */
-	private void loadDependencies(List<DependencySupplier> toInitialise){
+	private void initialiseDependencies(List<DependencySupplier> toInitialise){
 		List<DependencySupplier> loadedSuppliers = new ArrayList<>();
 		
 		// Loops through all dependencies left to load
@@ -109,32 +116,21 @@ public class Injector {
 		toInitialise.removeAll(loadedSuppliers);
 		
 		// If there are no more dependencies to load return the current map
-		if(!toInitialise.isEmpty()) loadDependencies(toInitialise);
+		if(!toInitialise.isEmpty()) initialiseDependencies(toInitialise);
 	}
 	
 	/**
-	 * Loads the supplier for a dependency class and stores
+	 * Generates the supplier for a dependency supplier and stores
 	 * in the dependency map for the class and all interfaces and superclasses.
-	 * @param c The class to load as a dependency. Must be
-	 * annotated with <code>@Dependency</code>
+	 * @param c The DependencySupplier to load as a dependency.
 	 */
-	private void loadDependency(DependencySupplier dep){
-		Supplier<Object> instance = dep.generateSupplier(this);
-		loadDependency(dep.getDependencyClass(), instance);
-	}
-	
-	private void loadDependency(Class<?> dep, Supplier<Object> instance){	
+	private void loadDependency(DependencySupplier dep){	
 		// Load concrete dependency class
-		loadDependency(dep, instance, true);
+		loadDependency(dep.getDependencyClass(), dep.getSupplier(this), true);
 		
-		// Load superclasses
-		for(Class<?> superclass : tools.getSuperClasses(dep)){
-			loadDependency(superclass, instance, false);
-		}
-		
-		// Load implementing interfaces
-		for(Class<?> iface : dep.getInterfaces()){
-			loadDependency(iface, instance, false);
+		// Loads assignable classes (super and interfaces)
+		for(Class<?> assignableClass : dep.getAssignableClasses()){
+			loadDependency(assignableClass, dep.getSupplier(this), false);
 		}
 	}
 	
@@ -149,7 +145,7 @@ public class Injector {
 	 * for the specified concrete class
 	 */
 	private void loadDependency(Class<?> dep, Supplier<Object> instance, boolean concrete){
-		boolean exists = dependencies.containsKey(dep);
+		boolean exists = hasDependency(dep);
 		
 		// If the concrete dependency already exists, throw an exception
 		if(exists && concrete) throw new DependencyCreationException("Dependency already exists for class.", dep);
@@ -219,8 +215,7 @@ public class Injector {
 	 * Gets an instance of a registered dependency.
 	 * This can either have been registered automatically
 	 * using the <code>@Dependency</code> annotation or
-	 * manually using the {@link Injector#registerDependency(Class, InstanceType)}
-	 * method.
+	 * manually using a {@link Configuration} class.
 	 * @param c The class to load the dependency for. Note
 	 * this can be an interface that the dependency implements.
 	 * @return An instance of the class specified.
@@ -269,6 +264,9 @@ public class Injector {
 		return instance;
 	}
 	
+	/**
+	 * @return Whether this Injector has a dependency stored for this class.
+	 */
 	public boolean hasDependency(Class<?> c){
 		return dependencies.containsKey(c);
 	}
