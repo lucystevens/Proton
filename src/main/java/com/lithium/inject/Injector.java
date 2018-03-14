@@ -63,6 +63,7 @@ public class Injector {
 	 * injected static dependencies where appropriate.
 	 */
 	private Injector(){
+		ClassScanner.getClassPath();
 		loadAllDependencies(new ExternalDependencyLoader(), new InternalDependencyLoader());
 		
 		this.dependencies.put(ClassPath.class, ClassScanner::getClassPath);
@@ -175,7 +176,15 @@ public class Injector {
 	 * @param c The class to scan.
 	 */
 	private void scanFields(Class<?> c){
-		for(Field f : c.getDeclaredFields()){
+		Field[] fields = new Field[0];
+		
+		// Classes far down the dependency chain sometimes have 
+		// fields which reference missing classes. Ignore these.
+		try{
+			fields = c.getDeclaredFields();
+		} catch(NoClassDefFoundError e){}
+		
+		for(Field f : fields){
 			if(tools.isInjectable(f, true)) injectIntoField(f, null);
 		}
 	}

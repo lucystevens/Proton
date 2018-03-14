@@ -1,16 +1,9 @@
 package com.lithium.scanner;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import com.lithium.scanner.resources.ResourceRoot;
+import com.lithium.scanner.resources.ResourceRootFactory;
 
 /**
  * A static class that scans the Java class
@@ -23,8 +16,6 @@ import java.util.zip.ZipInputStream;
 public class ClassScanner {
 	
 	private static final ClassPath INSTANCE = initClassPath();
-	
-	private static List<Class<?>> classes;
 	
 	/**
 	 * @return Gets the single ClassPath instance
@@ -43,134 +34,15 @@ public class ClassScanner {
 	 * the ClassPath.
 	 */
 	private static ClassPath initClassPath(){
-		try {
-			loadClasses();
-		} catch (IOException e) {
-			throw new ClassScanningException(e);
+		List<Class<?>> classes = new ArrayList<>();
+		ResourceRootFactory factory = new ResourceRootFactory();
+		for(ResourceRoot root : factory.getRoots()){
+			classes.addAll(root.getClasses());
 		}
 		return new ClassPath(classes);
 	}
 	
-	/**
-	 * Determines whether this application is running 
-	 * as a jar.
-	 * @return true if packaged as a jar, false if not.
-	 */
-	private static boolean isJar(){
-		return ClassScanner.class.getResource("ClassScanner.class").toString().startsWith("jar:");
-	}
 	
-	/**
-	 * Loads all classes from the java classpaths provided
-	 * by the system classloader into a list.
-	 * @throws IOException If there is an exception loading
-	 * classes from inside a jar file
-	 */
-	private static void loadClasses() throws IOException{
-		classes = new ArrayList<>();
-		Enumeration<URL> roots = ClassLoader.getSystemClassLoader().getResources("");
-		while(roots.hasMoreElements()){
-			loadClasses(roots.nextElement());
-		}
-	}
-	
-	/**
-	 * Loads all classes from a root URL into a list.
-	 * @param url The root directory of a java classpath
-	 * @throws IOException If there is an exception loading
-	 * classes from inside a jar file
-	 */
-	private static void loadClasses(URL url) throws IOException{
-		String path = formatURL(url);
-		if(isJar()) loadClassesJar();
-		else{
-			File root = new File(path);
-			if(root.isDirectory()) loadClasses(path, root);
-			else loadClass(path, root.getPath());
-		}
-	}
-	
-	/**
-	 * Decodes a URL into a file path
-	 * @param url The URL to decode
-	 * @return A String representing a system file path
-	 * @throws UnsupportedEncodingException 
-	 */
-	private static String formatURL(URL url) throws UnsupportedEncodingException{
-		String path = URLDecoder.decode(url.getPath(), "UTF-8");
-		
-		// This matches windows file patterns (e.g. \C:) and removes the '\'
-		return path.matches("(\\\\|\\/)[A-Z]:.*")? path.substring(1) : path;
-	}
-	
-	/**
-	 * Loads all classes on the classpath within a jar
-	 * into the class list.
-	 * @throws IOException If there is an exception loading
-	 * classes from inside a jar file
-	 */
-	private static void loadClassesJar() throws IOException{
-		
-		// Gets the path of the jar
-		String path = ClassScanner.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-		String decodedPath = URLDecoder.decode(path, "UTF-8");
-		
-		// Loops through all files within the Jar and loads each non-directory file
-		try(ZipInputStream zip = new ZipInputStream(new FileInputStream(decodedPath))){
-			for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-			    if (!entry.isDirectory()) {
-			        loadClass("", entry.getName());
-			    }
-			}
-		}
-		
-	}
-	
-	/**
-	 * Loads all classes recursively from within a given
-	 * directory into the list.
-	 * @param root The classpath root
-	 * @param dir The directory to scan
-	 */
-	private static void loadClasses(String root, File dir){
-		for(File file : dir.listFiles()){
-			if(file.isDirectory()) loadClasses(root, file);
-			else loadClass(root, file.getPath());
-		}
-	}
-	
-	/**
-	 * Loads a single class to the list. If it is
-	 * not a <code>.class</code> file or cannot be found
-	 * then it is simply ignored.
-	 * @param root The classpath root to be removed when
-	 * creating the fully qualified class name needed to
-	 * load the class.
-	 * @param path The path to the file to load.
-	 */
-	private static void loadClass(String root, String path){
-		
-		// Removes line separators from root path
-		root = root.replaceAll("\\\\|\\/", ".");
-		
-		try{
-			if(path.endsWith(".class")){
-				
-				// Formats the path name to load it as a class
-				String name = path.replaceAll("\\\\|\\/", ".").replace(root, "").replace(".class", "");
-				
-				/*
-				 * Do not initialise Injector as this will try and
-				 * retrieve the partially initialised ClassPath and fail
-				 */
-				if(!name.equals("com.lithium.inject.Injector")){
-					Class<?> c = Class.forName(name);
-					classes.add(c);
-				}
-			}
-		} catch(ClassNotFoundException e){
-			// Just don't load the class if it can't be found
-		}
-	}
+
 
 }
