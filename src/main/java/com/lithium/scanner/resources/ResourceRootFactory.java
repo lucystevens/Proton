@@ -36,6 +36,7 @@ public class ResourceRootFactory {
 		try{
 			for(String path : paths){
 				path = normalisePath(path);
+				System.out.println(path);
 				ResourceRoot root = noPathPrefix(path)? new JarRoot(getCodeSource())
 									: isJar(path)? new JarRoot(path)
 									: new ClasspathResourceRoot(path);
