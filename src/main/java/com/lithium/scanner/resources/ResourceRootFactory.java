@@ -1,5 +1,6 @@
 package com.lithium.scanner.resources;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class ResourceRootFactory {
 	 */
 	public ResourceRootFactory(){
 		String classpath = System.getProperty("java.class.path");
-		this.paths = classpath.split(";");
+		this.paths = classpath.split(File.pathSeparator);
 	}
 	
 	/**
