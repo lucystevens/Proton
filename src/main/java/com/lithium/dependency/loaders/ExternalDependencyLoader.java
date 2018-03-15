@@ -10,7 +10,6 @@ import com.lithium.dependency.suppliers.ConfiguredDependencySupplier;
 import com.lithium.dependency.suppliers.DependencySupplier;
 import com.lithium.inject.InjectionTools;
 import com.lithium.scanner.ClassPath;
-import com.lithium.scanner.ClassScanner;
 
 /**
  * A DependencyLoader that loads dependencies from the
@@ -20,7 +19,7 @@ import com.lithium.scanner.ClassScanner;
  */
 public class ExternalDependencyLoader implements DependencyLoader {
 	
-	private final ClassPath classpath = ClassScanner.getClassPath();
+	private final ClassPath classpath = ClassPath.getInstance();
 	private final InjectionTools tools = new InjectionTools();
 	private final List<DependencySupplier> dependencySuppliers = new ArrayList<>();
 

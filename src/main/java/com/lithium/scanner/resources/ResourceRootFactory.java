@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import com.lithium.scanner.ClassScanner;
 import com.lithium.scanner.ClassScanningException;
 
 /**
@@ -90,7 +89,7 @@ public class ResourceRootFactory {
 	 */
 	private String getCodeSource() {
 		try{
-			String path = ClassScanner.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 			String decodedPath = URLDecoder.decode(path, "UTF-8");
 			
 			return normalisePath(decodedPath);

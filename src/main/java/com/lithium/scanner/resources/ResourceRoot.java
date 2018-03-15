@@ -45,14 +45,8 @@ public abstract class ResourceRoot {
 				String name = path.replaceAll("\\\\|\\/", ".").replace(root, "").replace(".class", "");
 				if(name.startsWith(".")) name = name.substring(1);
 				
-				/*
-				 * Do not initialise Injector as this will try and
-				 * retrieve the partially initialised ClassPath and fail
-				 */
-				if(!name.equals("com.lithium.inject.Injector")){
-					Class<?> c = Class.forName(name);
-					classes.add(c);
-				}
+				Class<?> c = Class.forName(name, false, ClassLoader.getSystemClassLoader());
+				classes.add(c);
 			}
 		} catch(NoClassDefFoundError | ClassNotFoundException e){
 			// Just don't load the class if it can't be found

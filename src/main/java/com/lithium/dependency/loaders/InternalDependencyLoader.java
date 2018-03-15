@@ -7,7 +7,6 @@ import com.lithium.dependency.Dependency;
 import com.lithium.dependency.InstanceType;
 import com.lithium.dependency.suppliers.DependencySupplier;
 import com.lithium.scanner.ClassPath;
-import com.lithium.scanner.ClassScanner;
 
 /**
  * A Dependency Loader that loads classes annotated
@@ -17,7 +16,7 @@ import com.lithium.scanner.ClassScanner;
  */
 public class InternalDependencyLoader implements DependencyLoader {
 	
-	private final ClassPath classpath = ClassScanner.getClassPath();
+	private final ClassPath classpath = ClassPath.getInstance();
 	private final List<DependencySupplier> dependencySuppliers = new ArrayList<>();
 
 	@Override

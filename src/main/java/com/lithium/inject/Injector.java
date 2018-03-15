@@ -18,7 +18,6 @@ import com.lithium.dependency.suppliers.DependencySupplier;
 import com.lithium.inject.config.InjectableObject;
 import com.lithium.inject.exceptions.InjectionException;
 import com.lithium.scanner.ClassPath;
-import com.lithium.scanner.ClassScanner;
 
 /**
  * Singleton class for getting and injecting
@@ -55,7 +54,7 @@ public class Injector {
 	
 	private final Map<Class<?>, Supplier<Object>> dependencies = new HashMap<>();
 	private final InjectionTools tools = new InjectionTools();
-	private final ClassPath classpath = ClassScanner.getClassPath();
+	private final ClassPath classpath = ClassPath.getInstance();
 	
 	/**
 	 * Creates the single instance of this Injector,
@@ -63,10 +62,9 @@ public class Injector {
 	 * injected static dependencies where appropriate.
 	 */
 	private Injector(){
-		ClassScanner.getClassPath();
 		loadAllDependencies(new ExternalDependencyLoader(), new InternalDependencyLoader());
 		
-		this.dependencies.put(ClassPath.class, ClassScanner::getClassPath);
+		this.dependencies.put(ClassPath.class, ClassPath::getInstance);
 		this.dependencies.put(Injector.class, () -> this);
 		
 		injectStaticFields();

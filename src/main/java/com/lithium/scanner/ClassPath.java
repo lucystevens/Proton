@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
+import com.lithium.scanner.resources.ResourceRoot;
+import com.lithium.scanner.resources.ResourceRootFactory;
+
 /**
  * A Class to represent the Classes on the Java classpath
  * and to provide utility methods to access these.
@@ -14,14 +17,28 @@ import java.util.function.Predicate;
  */
 public class ClassPath {
 	
-	private List<Class<?>> classes;
+	private static final ClassPath INSTANCE = new ClassPath();
 	
 	/**
-	 * Constructed by {@link ClassScanner}
-	 * @param classes A List of all classes on the classpath
+	 * @return Gets the single ClassPath instance
 	 */
-	ClassPath(List<Class<?>> classes) {
-		this.classes = classes;
+	public static ClassPath getInstance(){
+		return INSTANCE;
+	}
+	
+	private List<Class<?>> classes = new ArrayList<>();
+	
+	/**
+	 * Scans the Java class
+	 * path, retrieves all <code>.class</code> files
+	 * on load, and uses them to instantiate the single
+	 * instance.
+	 */
+	private ClassPath(){
+		ResourceRootFactory factory = new ResourceRootFactory();
+		for(ResourceRoot root : factory.getRoots()){
+			classes.addAll(root.getClasses());
+		}
 	}
 	
 	/**

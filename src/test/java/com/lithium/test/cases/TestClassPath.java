@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 
 import com.lithium.inject.Injector;
 import com.lithium.scanner.ClassPath;
-import com.lithium.scanner.ClassScanner;
 import com.lithium.test.dependencies.MultipleDependency;
 import com.lithium.test.dependencies.SingletonDependency;
 import com.lithium.test.suites.InjectionTestSuite;
@@ -17,7 +16,7 @@ import static org.junit.Assert.*;
 
 public class TestClassPath {
 	
-	ClassPath classpath = ClassScanner.getClassPath();
+	ClassPath classpath = ClassPath.getInstance();
 	Injector injector = Injector.getInstance();
 
 	@Test
