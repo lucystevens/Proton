@@ -34,19 +34,25 @@ public class ResourceRootFactory {
 	 */
 	public List<ResourceRoot> getRoots(){
 		List<ResourceRoot> roots = new ArrayList<>();
-		try{
-			for(String path : paths){
-				path = normalisePath(path);
-				System.out.println(path);
-				ResourceRoot root = noPathPrefix(path)? new JarRoot(getCodeSource())
-									: isJar(path)? new JarRoot(path)
-									: new ClasspathResourceRoot(path);
-				roots.add(root);
-			}
-		} catch(UnsupportedEncodingException e){
-			throw new ClassScanningException(e);
+		for(String path : paths){
+			path = normalisePath(path);
+			ResourceRoot root = getRoot(path);
+			roots.add(root);
 		}
 		return roots;
+	}
+	
+	/**
+	 * Gets the relevant resource root associated with
+	 * this path.
+	 * @param path The resource path
+	 * @return A ResourceRoot implementation for the 
+	 * supplied resource path.
+	 */
+	private ResourceRoot getRoot(String path){
+		if(noPathPrefix(path)) return new JarRoot(getCodeSource());
+		else if (isJar(path)) return new JarRoot(path);
+		else return new ClasspathResourceRoot(path);
 	}
 	
 	/**
@@ -82,11 +88,16 @@ public class ResourceRootFactory {
 	/**
 	 * @return The directory or file where the code is currently being executed from
 	 */
-	private String getCodeSource() throws UnsupportedEncodingException{
-		String path = ClassScanner.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-		String decodedPath = URLDecoder.decode(path, "UTF-8");
-		
-		return normalisePath(decodedPath);
+	private String getCodeSource() {
+		try{
+			String path = ClassScanner.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			String decodedPath = URLDecoder.decode(path, "UTF-8");
+			
+			return normalisePath(decodedPath);
+			
+		} catch(UnsupportedEncodingException e){
+			throw new ClassScanningException(e);
+		}
 	}
 
 }

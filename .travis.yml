@@ -1,1 +1,10 @@
 language: java
+addons:
+  sonarcloud:
+    organization: "lukecmstevens-github"
+    token: $SONAR_TOKEN
+    branches:
+      - master
+      - development
+script:
+  - sonar-scanner

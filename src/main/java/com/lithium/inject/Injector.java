@@ -182,7 +182,9 @@ public class Injector {
 		// fields which reference missing classes. Ignore these.
 		try{
 			fields = c.getDeclaredFields();
-		} catch(NoClassDefFoundError e){}
+		} catch(NoClassDefFoundError e){
+			// Ignore classes with missing fields
+		}
 		
 		for(Field f : fields){
 			if(tools.isInjectable(f, true)) injectIntoField(f, null);

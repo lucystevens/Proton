@@ -116,8 +116,7 @@ public class InjectionTools {
 	 */
 	public boolean toBeLoaded(Class<?> c, List<DependencySupplier> toInit){
 		for(DependencySupplier dep : toInit){
-			if(dep.getDependencyClass().equals(c)) return true;
-			else if(dep.getSubDependencies().contains(c)) return true;
+			if(dep.getDependencyClass().equals(c) || dep.getSubDependencies().contains(c)) return true;
 		}
 		return false;
 	}
