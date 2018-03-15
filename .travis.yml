@@ -7,4 +7,4 @@ addons:
       - master
       - development
 script:
-  - sonar-scanner
+  - mvn sonar:sonar
