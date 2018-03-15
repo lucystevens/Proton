@@ -3,6 +3,7 @@ package com.lithium.test.cases;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.lithium.inject.InjectionManager;
 import com.lithium.inject.Injector;
 import com.lithium.scanner.ClassPath;
 import com.lithium.test.dependencies.MultipleDependency;
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
 public class TestClassPath {
 	
 	ClassPath classpath = ClassPath.getInstance();
-	Injector injector = Injector.getInstance();
+	Injector injector = InjectionManager.getDefaultInjector();
 
 	@Test
 	public void filterByAnnotation(){

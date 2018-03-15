@@ -1,6 +1,6 @@
 package com.lithium.inject.config;
 
-import com.lithium.inject.Injector;
+import com.lithium.inject.InjectionManager;
 
 /**
  * An abstract class to allow dependencies to be
@@ -16,7 +16,7 @@ import com.lithium.inject.Injector;
 public abstract class InjectableObject {
 	
 	public InjectableObject(){
-		Injector.getInstance().injectDependencies(this);
+		InjectionManager.getDefaultInjector().injectDependencies(this);
 	}
 
 }
