@@ -1,15 +1,13 @@
 package com.lithium.dependency.loaders;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.lithium.configuration.Configuration;
 import com.lithium.configuration.ConfigurationException;
 import com.lithium.dependency.suppliers.ConfiguredDependencySupplier;
-import com.lithium.dependency.suppliers.DependencySupplier;
+import com.lithium.inject.InjectionManager;
 import com.lithium.inject.InjectionTools;
-import com.lithium.scanner.ClassPath;
 
 /**
  * A DependencyLoader that loads dependencies from the
@@ -17,33 +15,44 @@ import com.lithium.scanner.ClassPath;
  * 
  * @author Luke Stevens
  */
-public class ExternalDependencyLoader implements DependencyLoader {
+public class ExternalDependencyLoader extends AbstractDependencyLoader {
 	
-	private final ClassPath classpath = ClassPath.getInstance();
-	private final InjectionTools tools = new InjectionTools();
-	private final List<DependencySupplier> dependencySuppliers = new ArrayList<>();
-
-	@Override
-	public List<DependencySupplier> getDependencies() {
-		List<Class<?>> configs = classpath.getClassesWithAnnotation(Configuration.class);
-		configs.forEach(this::loadExternalDependencies);
-		return dependencySuppliers;
+	final InjectionTools tools = new InjectionTools();
+	String qualifier;
+	
+	public ExternalDependencyLoader() {
+		this(InjectionManager.ROOT_QUALIFIER);
 	}
 	
+	public ExternalDependencyLoader(String qualifier) {
+		this.qualifier = qualifier;
+	}
+
+	@Override
+	List<Class<?>> getClasses() {
+		return classpath.getClassesWithAnnotation(Configuration.class);
+	}
+
+	@Override
+	boolean shouldLoad(Class<?> c) {
+		return c.getAnnotation(Configuration.class).qualifier().equals(qualifier);
+	}
+
 	/**
 	 * Loads all external dependencies from a single
 	 * configuration class.
 	 * @param configClass The configuration class to load external
 	 * dependencies from.
 	 */
-	private void loadExternalDependencies(Class<?> configClass){
-		if(configClass.isInterface()) {
-			throw new ConfigurationException("The configuration class must not be abstract or an interface", configClass);
+	@Override
+	void loadClass(Class<?> c) {
+		if(c.isInterface()) {
+			throw new ConfigurationException("The configuration class must not be abstract or an interface", c);
 		}
 		
-		Object config = tools.construct(configClass);
+		Object config = tools.construct(c);
 				
-		for(Method m : configClass.getDeclaredMethods()){
+		for(Method m : c.getDeclaredMethods()){
 			dependencySuppliers.add(new ConfiguredDependencySupplier(m, config));
 		}
 	}

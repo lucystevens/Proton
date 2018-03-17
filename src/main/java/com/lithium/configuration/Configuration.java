@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.lithium.inject.InjectionManager;
+
 /**
  * Simple annotation to define classes for configuring
  * external dependencies.<br>
@@ -20,4 +22,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value={ElementType.TYPE})
-public @interface Configuration {}
+public @interface Configuration {
+	
+	public String qualifier() default InjectionManager.ROOT_QUALIFIER;
+}

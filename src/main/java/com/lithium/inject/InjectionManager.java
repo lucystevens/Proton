@@ -3,6 +3,8 @@ package com.lithium.inject;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.lithium.configuration.Qualifier;
+
 public class InjectionManager {
 	
 	public static final String ROOT_QUALIFIER = "root";
@@ -34,12 +36,18 @@ public class InjectionManager {
 			synchronized (Injector.class) {
 				Injector i = INSTANCES.get(qualifier);
 				if(i == null){
-					i = new RootInjector();
+					i = new QualifiedInjector(qualifier);
 					INSTANCES.put(qualifier, i);
 				}
 				return i;
 			}
 		}
+	}
+	
+	public static Injector getInjector(Class<?> c){
+		Qualifier q = c.getAnnotation(Qualifier.class);
+		if(q == null || q.value().equals(ROOT_QUALIFIER)) return ROOT;
+		else return getInjector(q.value());
 	}
 	
 	public static Injector getDefaultInjector(){

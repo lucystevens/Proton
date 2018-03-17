@@ -10,10 +10,7 @@ import java.util.function.Supplier;
 import com.lithium.configuration.Configuration;
 import com.lithium.dependency.exceptions.AmbiguousDependencyException;
 import com.lithium.dependency.exceptions.DependencyCreationException;
-import com.lithium.dependency.exceptions.MissingDependencyException;
 import com.lithium.dependency.loaders.DependencyLoader;
-import com.lithium.dependency.loaders.ExternalDependencyLoader;
-import com.lithium.dependency.loaders.InternalDependencyLoader;
 import com.lithium.dependency.suppliers.DependencySupplier;
 import com.lithium.inject.config.InjectableObject;
 import com.lithium.inject.exceptions.InjectionException;
@@ -30,8 +27,8 @@ abstract class AbstractInjector implements Injector{
 	 * by scanning all classes on the classpath and
 	 * injected static dependencies where appropriate.
 	 */
-	AbstractInjector(){
-		loadAllDependencies(new ExternalDependencyLoader(), new InternalDependencyLoader());
+	AbstractInjector(DependencyLoader...loaders){
+		loadAllDependencies(loaders);
 		
 		this.dependencies.put(ClassPath.class, ClassPath::getInstance);
 		this.dependencies.put(AbstractInjector.class, () -> this);
@@ -201,12 +198,7 @@ abstract class AbstractInjector implements Injector{
 	 * @throws DependencyCreationException If there is no stored
 	 * dependency for the class, and a new one cannot be loaded.
 	 */
-	public <T> T getDependency(Class<T> c){
-		Supplier<Object> instance = dependencies.get(c);
-		if(instance == null) throw new MissingDependencyException(c);
-		
-		return c.cast(instance.get());
-	}
+	public abstract <T> T getDependency(Class<T> c);
 	
 	/**
 	 * Injects dependencies into an already instantiated 
@@ -246,8 +238,6 @@ abstract class AbstractInjector implements Injector{
 	/**
 	 * @return Whether this Injector has a dependency stored for this class.
 	 */
-	public boolean hasDependency(Class<?> c){
-		return dependencies.containsKey(c);
-	}
+	public abstract boolean hasDependency(Class<?> c);
 
 }

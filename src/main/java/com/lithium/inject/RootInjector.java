@@ -1,5 +1,11 @@
 package com.lithium.inject;
 
+import java.util.function.Supplier;
+
+import com.lithium.dependency.exceptions.MissingDependencyException;
+import com.lithium.dependency.loaders.ExternalDependencyLoader;
+import com.lithium.dependency.loaders.InternalDependencyLoader;
+
 /**
  * Singleton class for getting and injecting
  * dependencies.<br>
@@ -18,8 +24,21 @@ class RootInjector extends AbstractInjector{
 	 * injected static dependencies where appropriate.
 	 */
 	RootInjector(){
-		super();
+		super(new ExternalDependencyLoader(), new InternalDependencyLoader());
 		this.dependencies.put(RootInjector.class, () -> this);
+	}
+	
+	@Override
+	public <T> T getDependency(Class<T> c){
+		Supplier<Object> instance = dependencies.get(c);
+		if(instance == null) throw new MissingDependencyException(c);
+		
+		return c.cast(instance.get());
+	}
+	
+	@Override
+	public boolean hasDependency(Class<?> c){
+		return dependencies.containsKey(c);
 	}
 
 }

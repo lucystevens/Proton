@@ -1,12 +1,11 @@
 package com.lithium.dependency.loaders;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.lithium.configuration.Qualifier;
 import com.lithium.dependency.Dependency;
 import com.lithium.dependency.InstanceType;
-import com.lithium.dependency.suppliers.DependencySupplier;
-import com.lithium.scanner.ClassPath;
+import com.lithium.inject.InjectionManager;
 
 /**
  * A Dependency Loader that loads classes annotated
@@ -14,21 +13,23 @@ import com.lithium.scanner.ClassPath;
  * 
  * @author Luke Stevens
  */
-public class InternalDependencyLoader implements DependencyLoader {
+public class InternalDependencyLoader extends AbstractDependencyLoader {
 	
-	private final ClassPath classpath = ClassPath.getInstance();
-	private final List<DependencySupplier> dependencySuppliers = new ArrayList<>();
+	@Override
+	boolean shouldLoad(Class<?> c){
+		Qualifier q = c.getAnnotation(Qualifier.class);
+		return q == null || q.value().equals(InjectionManager.ROOT_QUALIFIER);
+	}
 
 	@Override
-	public List<DependencySupplier> getDependencies() {
-		List<Class<?>> classes = classpath.getClassesWithAnnotation(Dependency.class);
-		classes.forEach(this::loadInternalDependency);
-		return dependencySuppliers;
+	List<Class<?>> getClasses() {
+		return classpath.getClassesWithAnnotation(Dependency.class);
 	}
-	
-	private void loadInternalDependency(Class<?> depClass){
-		InstanceType type = depClass.getAnnotation(Dependency.class).type();
-		dependencySuppliers.add(type.createSupplier(depClass));
+
+	@Override
+	void loadClass(Class<?> c) {
+		InstanceType type = c.getAnnotation(Dependency.class).type();
+		dependencySuppliers.add(type.createSupplier(c));
 	}
 
 }

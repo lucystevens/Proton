@@ -16,7 +16,7 @@ import com.lithium.inject.InjectionManager;
 public abstract class InjectableObject {
 	
 	public InjectableObject(){
-		InjectionManager.getDefaultInjector().injectDependencies(this);
+		InjectionManager.getInjector(this.getClass()).injectDependencies(this);
 	}
 
 }
