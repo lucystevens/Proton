@@ -2,7 +2,7 @@ package com.lithium.inject;
 
 import java.util.function.Supplier;
 
-import com.lithium.dependency.loaders.ExternalDependencyLoader;
+import com.lithium.dependency.loaders.ConfigurationDependencyLoader;
 import com.lithium.dependency.loaders.QualifiedClasspathDependencyLoader;
 
 class QualifiedInjector extends AbstractInjector {
@@ -10,7 +10,7 @@ class QualifiedInjector extends AbstractInjector {
 	String qualifier;
 	
 	QualifiedInjector(String qualifier){
-		super(new ExternalDependencyLoader(qualifier), new QualifiedClasspathDependencyLoader(qualifier));
+		super(new ConfigurationDependencyLoader(qualifier), new QualifiedClasspathDependencyLoader(qualifier));
 		this.dependencies.put(QualifiedInjector.class, () -> this);
 	}
 
@@ -29,5 +29,4 @@ class QualifiedInjector extends AbstractInjector {
 	private Injector root(){
 		return InjectionManager.getRootInjector();
 	}
-
 }

@@ -10,21 +10,21 @@ import com.lithium.inject.InjectionManager;
 import com.lithium.inject.InjectionTools;
 
 /**
- * A DependencyLoader that loads dependencies from the
+ * A ClasspathDependencyLoader that loads dependencies from the
  * classes annotated with <code>@</code>{@link Configuration}.
  * 
  * @author Luke Stevens
  */
-public class ExternalDependencyLoader extends AbstractDependencyLoader {
+public class ConfigurationDependencyLoader extends AbstractDependencyLoader {
 	
 	final InjectionTools tools = new InjectionTools();
 	String qualifier;
 	
-	public ExternalDependencyLoader() {
+	public ConfigurationDependencyLoader() {
 		this(InjectionManager.ROOT_QUALIFIER);
 	}
 	
-	public ExternalDependencyLoader(String qualifier) {
+	public ConfigurationDependencyLoader(String qualifier) {
 		this.qualifier = qualifier;
 	}
 

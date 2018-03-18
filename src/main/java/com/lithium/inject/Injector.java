@@ -53,5 +53,13 @@ public interface Injector {
 	 * @return Whether this Injector has a dependency stored for this class.
 	 */
 	public boolean hasDependency(Class<?> c);
+	
+	
+	/**
+	 * Scans all fields on a class and, for each eligible static field,
+	 * sets it's value to an appropriate dependency.
+	 * @param c The class to scan.
+	 */
+	public void injectIntoStaticFields(Class<?> c);
 
 }

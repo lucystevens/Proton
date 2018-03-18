@@ -3,8 +3,8 @@ package com.lithium.inject;
 import java.util.function.Supplier;
 
 import com.lithium.dependency.exceptions.MissingDependencyException;
-import com.lithium.dependency.loaders.ExternalDependencyLoader;
-import com.lithium.dependency.loaders.InternalDependencyLoader;
+import com.lithium.dependency.loaders.ConfigurationDependencyLoader;
+import com.lithium.dependency.loaders.ClasspathDependencyLoader;
 
 /**
  * Singleton class for getting and injecting
@@ -24,7 +24,7 @@ class RootInjector extends AbstractInjector{
 	 * injected static dependencies where appropriate.
 	 */
 	RootInjector(){
-		super(new ExternalDependencyLoader(), new InternalDependencyLoader());
+		super(new ConfigurationDependencyLoader(), new ClasspathDependencyLoader());
 		this.dependencies.put(RootInjector.class, () -> this);
 	}
 	

@@ -2,7 +2,7 @@ package com.lithium.dependency.loaders;
 
 import com.lithium.configuration.Qualifier;
 
-public class QualifiedClasspathDependencyLoader extends InternalDependencyLoader {
+public class QualifiedClasspathDependencyLoader extends ClasspathDependencyLoader {
 	
 	String qualifier;
 	

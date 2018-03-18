@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.lithium.configuration.Qualifier;
+import com.lithium.scanner.ClassPath;
 
 public class InjectionManager {
 	
@@ -16,7 +17,9 @@ public class InjectionManager {
 	static{
 		String defaultQualifier = System.getProperty("proton.injector.default");
 		DEFAULT = (defaultQualifier==null)? ROOT : getInjector(defaultQualifier);
+		injectStaticFields();
 	}
+	
 	
 	/**
 	 * Used to load the Injection Manager class and initialise
@@ -61,5 +64,16 @@ public class InjectionManager {
 	public static Injector getRootInjector(){
 		return ROOT;
 	}
-
+	
+	/**
+	 * Scans all classes on the class path and, for each
+	 * class found, injects dependencies into static
+	 * fields annotated by the <code>@Inject</code> annotation. 
+	 */
+	static void injectStaticFields(){
+		for(Class<?> c : ClassPath.getInstance().getClasses()){
+			getInjector(c).injectIntoStaticFields(c);
+		}
+	}
+	
 }

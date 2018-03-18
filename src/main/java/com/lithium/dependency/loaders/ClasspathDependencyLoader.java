@@ -13,7 +13,7 @@ import com.lithium.inject.InjectionManager;
  * 
  * @author Luke Stevens
  */
-public class InternalDependencyLoader extends AbstractDependencyLoader {
+public class ClasspathDependencyLoader extends AbstractDependencyLoader {
 	
 	@Override
 	boolean shouldLoad(Class<?> c){

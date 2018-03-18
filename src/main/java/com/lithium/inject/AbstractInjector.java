@@ -33,8 +33,6 @@ abstract class AbstractInjector implements Injector{
 		this.dependencies.put(ClassPath.class, ClassPath::getInstance);
 		this.dependencies.put(AbstractInjector.class, () -> this);
 		this.dependencies.put(Injector.class, () -> this);
-		
-		injectStaticFields();
 	}
 	
 	/**
@@ -125,22 +123,11 @@ abstract class AbstractInjector implements Injector{
 	}
 	
 	/**
-	 * Scans all classes on the class path and, for each
-	 * class found, injects dependencies into static
-	 * fields annotated by the <code>@Inject</code> annotation. 
-	 */
-	void injectStaticFields(){
-		for(Class<?> c : classpath.getClasses()){
-			scanFields(c);
-		}
-	}
-	
-	/**
 	 * Scans all fields on a class and, for each eligible field,
 	 * sets it's value to an appropriate dependency.
 	 * @param c The class to scan.
 	 */
-	void scanFields(Class<?> c){
+	public void injectIntoStaticFields(Class<?> c){
 		Field[] fields = new Field[0];
 		
 		// Classes far down the dependency chain sometimes have 
