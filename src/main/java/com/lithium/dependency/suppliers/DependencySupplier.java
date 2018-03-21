@@ -74,8 +74,8 @@ public abstract class DependencySupplier {
 		subDependencies = new ArrayList<>();
 		
 		// Get field sub dependencies
-		for(Field f : dependency.getDeclaredFields()){
-			if(tools.isInjectable(f, false)) subDependencies.add(f.getType());
+		for(Field f : tools.getAllInjectableFields(dependency)){
+			subDependencies.add(f.getType());
 		}
 		
 		// Get constructor sub dependencies

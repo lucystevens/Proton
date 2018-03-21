@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import com.lithium.dependency.exceptions.DependencyCreationException;
 import com.lithium.dependency.exceptions.MissingConstructorException;
@@ -140,6 +141,25 @@ public class InjectionTools {
 			if(dep.getDependencyClass().equals(c) || dep.getAssignableClasses().contains(c)) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Gets all non-static fields annotated with `@Inject` in this
+	 * class and, recursively, all of it's superclasses.
+	 * @param c The class to get all injectable fields for.
+	 * @return All injectable fields from a class and it's
+	 * superclasses.
+	 */
+	public List<Field> getAllInjectableFields(Class<?> c){
+		List<Field> fields = new ArrayList<>();
+		if(c == null) return fields;
+		
+		for(Field f : c.getDeclaredFields()){
+			if(isInjectable(f, false)) fields.add(f);
+		}
+		
+		fields.addAll(getAllInjectableFields(c.getSuperclass()));
+		return fields;
 	}
 
 }
