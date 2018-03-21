@@ -154,6 +154,7 @@ public abstract class DependencySupplier {
 		Class<?> superclass = dependency.getSuperclass();
 		while(superclass != null){
 			assignableClasses.add(superclass);
+			assignableClasses.addAll(Arrays.asList(superclass.getInterfaces()));
 			superclass = superclass.getSuperclass();
 		}
 		
