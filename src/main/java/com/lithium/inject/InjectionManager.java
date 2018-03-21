@@ -1,7 +1,7 @@
 package com.lithium.inject;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.lithium.configuration.Qualifier;
 import com.lithium.scanner.ClassPath;
@@ -11,14 +11,16 @@ public class InjectionManager {
 	public static final String ROOT_QUALIFIER = "root";
 	
 	private static final Injector ROOT = new RootInjector();
-	private static final Map<String, Injector> INSTANCES = new HashMap<>();
-	private static Injector DEFAULT;
+	private static final Map<String, Injector> INSTANCES = new ConcurrentHashMap<>();
+	private static Injector defaultInjector;
 	
 	static{
 		String defaultQualifier = System.getProperty("proton.injector.default");
-		DEFAULT = (defaultQualifier==null)? ROOT : getInjector(defaultQualifier);
+		defaultInjector = (defaultQualifier==null)? ROOT : getInjector(defaultQualifier);
 		injectStaticFields();
 	}
+	
+	private InjectionManager(){/* Hide public constructor in static class */}
 	
 	
 	/**
@@ -30,21 +32,11 @@ public class InjectionManager {
 	 * will achieve the same results, but this method makes the
 	 * intention more obvious.
 	 */
-	public static void init(){ /* Doesn't do anything other than force loading of the class */ };
+	public static void init(){ /* Doesn't do anything other than force loading of the class */ }
 	
 	public static Injector getInjector(String qualifier){
 		if(qualifier.equals(ROOT_QUALIFIER)) return ROOT;
-		else {
-			
-			synchronized (Injector.class) {
-				Injector i = INSTANCES.get(qualifier);
-				if(i == null){
-					i = new QualifiedInjector(qualifier);
-					INSTANCES.put(qualifier, i);
-				}
-				return i;
-			}
-		}
+		else return INSTANCES.computeIfAbsent(qualifier, QualifiedInjector::new);
 	}
 	
 	public static Injector getInjector(Class<?> c){
@@ -54,11 +46,11 @@ public class InjectionManager {
 	}
 	
 	public static Injector getDefaultInjector(){
-		return DEFAULT;
+		return defaultInjector;
 	}
 	
 	public static void setDefaultInjector(String qualifier){
-		DEFAULT = getInjector(qualifier);
+		defaultInjector = getInjector(qualifier);
 	}
 	
 	public static Injector getRootInjector(){

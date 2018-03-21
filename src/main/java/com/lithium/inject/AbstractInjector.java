@@ -7,12 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.lithium.configuration.Configuration;
 import com.lithium.dependency.exceptions.AmbiguousDependencyException;
 import com.lithium.dependency.exceptions.DependencyCreationException;
 import com.lithium.dependency.loaders.DependencyLoader;
 import com.lithium.dependency.suppliers.DependencySupplier;
-import com.lithium.inject.config.InjectableObject;
 import com.lithium.inject.exceptions.InjectionException;
 import com.lithium.scanner.ClassPath;
 
@@ -160,12 +158,8 @@ abstract class AbstractInjector implements Injector{
 		}
 	}
 	
-	/**
-	 * Converts an array of classes to an array of dependencies
-	 * by retrieving the dependency associated with each class.
-	 * @param classes An array of classes
-	 * @return An array of dependencies
-	 */
+
+	@Override
 	public Object[] getDependencies(Class<?>[] classes){
 		Object[] params = new Object[classes.length];
 		for(int i = 0; i < classes.length; i++){
@@ -174,29 +168,7 @@ abstract class AbstractInjector implements Injector{
 		return params;
 	}
 	
-	/**
-	 * Gets an instance of a registered dependency.
-	 * This can either have been registered automatically
-	 * using the <code>@Dependency</code> annotation or
-	 * manually using a {@link Configuration} class.
-	 * @param c The class to load the dependency for. Note
-	 * this can be an interface that the dependency implements.
-	 * @return An instance of the class specified.
-	 * @throws DependencyCreationException If there is no stored
-	 * dependency for the class, and a new one cannot be loaded.
-	 */
-	public abstract <T> T getDependency(Class<T> c);
-	
-	/**
-	 * Injects dependencies into an already instantiated 
-	 * object. This scans every field within the Object 
-	 * for those annotated with <code>@Inject</code> and
-	 * sets the value of those fields to a relevant dependency.<br><br>
-	 * <i>Note: this method is called during instantiation for
-	 * any Object extending {@link InjectableObject} and so
-	 * does not need to be called manually for those Objects</i>
-	 * @param o The object to inject dependencies into.
-	 */
+	@Override
 	public void injectDependencies(Object o){
 		Class<?> c = o.getClass();
 		for(Field f : c.getDeclaredFields()){
@@ -204,14 +176,7 @@ abstract class AbstractInjector implements Injector{
 		}
 	}
 	
-	/**
-	 * Gets a new instance of the specified class:
-	 * If there is a constructor annotated with <code>@Inject</code>
-	 * then this will be used and the arguments will be injected as 
-	 * dependencies. Otherwise the default constructor will be used.
-	 * @param c The class to construct an instance of.
-	 * @return An instance of the Class c
-	 */
+	@Override
 	public <T> T newInstance(Class<T> c) {
 		Class<?>[] classes = tools.getConstructorTypes(c);
 
@@ -222,9 +187,5 @@ abstract class AbstractInjector implements Injector{
 		return instance;
 	}
 	
-	/**
-	 * @return Whether this Injector has a dependency stored for this class.
-	 */
-	public abstract boolean hasDependency(Class<?> c);
 
 }

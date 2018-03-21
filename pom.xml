@@ -4,6 +4,12 @@
 	<groupId>com.lithium</groupId>
 	<artifactId>Proton</artifactId>
 	<version>0.1.5-alpha</version>
+	
+	<properties>
+    	<test>com.lithium.test.suites.InjectionTestSuite</test>
+    </properties>
+	
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -16,7 +22,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	
 	<dependencies>
+	
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 		    <groupId>junit</groupId>
@@ -24,5 +33,7 @@
 		    <version>4.12</version>
 		    <scope>test</scope>
 		</dependency>
+		
 	</dependencies>
+	
 </project>
