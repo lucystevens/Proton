@@ -9,8 +9,10 @@ import com.lithium.test.cases.TestDependenciesWithDependencies;
 import com.lithium.test.cases.TestExtensionInjection;
 import com.lithium.test.cases.TestInjectionExceptions;
 import com.lithium.test.cases.TestInjectorManagedConstruction;
+import com.lithium.test.cases.TestInvalidQualifiedInjection;
 import com.lithium.test.cases.TestManualInjection;
 import com.lithium.test.cases.TestQualifiedConfiguration;
+import com.lithium.test.cases.TestQualifiedInjection;
 import com.lithium.test.cases.TestStaticInjection;
 
 @RunWith(InjectionSuiteRunner.class)
@@ -23,7 +25,9 @@ import com.lithium.test.cases.TestStaticInjection;
 	TestInjectionExceptions.class,
 	TestInjectorManagedConstruction.class,
 	TestConfiguration.class,
-	TestQualifiedConfiguration.class
+	TestQualifiedConfiguration.class,
+	TestQualifiedInjection.class,
+	TestInvalidQualifiedInjection.class
 	})
 public class InjectionTestSuite {
 
