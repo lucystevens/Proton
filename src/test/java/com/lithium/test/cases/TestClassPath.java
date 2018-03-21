@@ -3,11 +3,10 @@ package com.lithium.test.cases;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.lithium.inject.InjectionManager;
-import com.lithium.inject.Injector;
 import com.lithium.scanner.ClassPath;
 import com.lithium.test.dependencies.MultipleDependency;
 import com.lithium.test.dependencies.SingletonDependency;
+import com.lithium.test.suites.InjectionSuiteRunner;
 import com.lithium.test.suites.InjectionTestSuite;
 
 import java.io.Serializable;
@@ -18,7 +17,6 @@ import static org.junit.Assert.*;
 public class TestClassPath {
 	
 	ClassPath classpath = ClassPath.getInstance();
-	Injector injector = InjectionManager.getDefaultInjector();
 
 	@Test
 	public void filterByAnnotation(){
@@ -30,8 +28,9 @@ public class TestClassPath {
 	@Test
 	public void filterByPackage(){
 		List<Class<?>> classes = classpath.getClassesInPackage("com.lithium.test.suites");
-		assertFalse("List of classes in package is empty", classes.isEmpty());
-		assertTrue("First element actually " + classes.get(0), classes.get(0).equals(InjectionTestSuite.class));
+		assertTrue("Expected 2 classes in package. Actually " + classes.size(), classes.size() == 2);
+		assertTrue("List does not contain InjectionTestSuite.class", classes.contains(InjectionTestSuite.class));
+		assertTrue("List does not contain InjectionSuiteRunner.class", classes.contains(InjectionSuiteRunner.class));
 	}
 	
 	@Test

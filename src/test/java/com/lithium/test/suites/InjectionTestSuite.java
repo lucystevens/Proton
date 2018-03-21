@@ -13,7 +13,7 @@ import com.lithium.test.cases.TestManualInjection;
 import com.lithium.test.cases.TestQualifiedConfiguration;
 import com.lithium.test.cases.TestStaticInjection;
 
-@RunWith(Suite.class)
+@RunWith(InjectionSuiteRunner.class)
 @Suite.SuiteClasses({
 	TestClassPath.class,
 	TestStaticInjection.class,
