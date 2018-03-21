@@ -50,7 +50,7 @@ public class ConfigurationDependencyLoader extends AbstractDependencyLoader {
 			throw new ConfigurationException("The configuration class must not be abstract or an interface", c);
 		}
 		
-		Object config = tools.construct(c);
+		Object config = tools.construct(c, new Class<?>[0], new Object[0]);
 				
 		for(Method m : c.getDeclaredMethods()){
 			dependencySuppliers.add(new ConfiguredDependencySupplier(m, config));

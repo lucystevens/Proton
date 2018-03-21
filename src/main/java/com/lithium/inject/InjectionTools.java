@@ -56,16 +56,37 @@ public class InjectionTools {
 	}
 	
 	/**
-	 * Constructs an object, given the parameters to use.
+	 * Constructs an object, given the parameters to use.<br>
 	 * @param c The class to construct an instance of.
 	 * @param params The parameters to pass to the constructor.
 	 * @return A new instance of the object, constructed using the
 	 * supplied parameters.
 	 * @throws DependencyCreationException If there is
 	 * not constructor matching the supplied parameters.
+	 * @deprecated This does not take into account abstractions
+	 * such as superclasses or interfaces. Please use 
+	 * {@link #construct(Class, Class[], Object[])} instead
 	 */
-	public <T> T construct(Class<T> c, Object...params){
+	@Deprecated
+	public <T> T construct(Class<T> c, Object[] params){
 		Class<?>[] classes = argsToClasses(params);
+		return construct(c, classes, params);
+	}
+	
+	/**
+	 * Constructs an object, given the classes to use to
+	 * select the appropriate constructor, and the parameters
+	 * to pass to it.
+	 * @param c The class to construct an instance of.
+	 * @param classes An array of classes matching the constrcutor
+	 * declaration.
+	 * @param params The parameters to pass to the constructor.
+	 * @return A new instance of the object, constructed using the
+	 * supplied parameters.
+	 * @throws DependencyCreationException If there is
+	 * not constructor matching the supplied parameters.
+	 */
+	public <T> T construct(Class<T> c, Class<?>[] classes, Object[] params){
 		try {
 			Constructor<T> con = c.getDeclaredConstructor(classes);
 			con.setAccessible(true);
@@ -116,7 +137,7 @@ public class InjectionTools {
 	 */
 	public boolean toBeLoaded(Class<?> c, List<DependencySupplier> toInit){
 		for(DependencySupplier dep : toInit){
-			if(dep.getDependencyClass().equals(c) || dep.getSubDependencies().contains(c)) return true;
+			if(dep.getDependencyClass().equals(c) || dep.getAssignableClasses().contains(c)) return true;
 		}
 		return false;
 	}

@@ -107,7 +107,9 @@ abstract class AbstractInjector implements Injector{
 	 * for the specified concrete class
 	 */
 	void loadDependency(Class<?> dep, Supplier<Object> instance, boolean concrete){
-		boolean exists = hasDependency(dep);
+		
+		// Only check dependency map for this Injector
+		boolean exists = dependencies.containsKey(dep);
 		
 		// If the concrete dependency already exists, throw an exception
 		if(exists && concrete) throw new DependencyCreationException("Dependency already exists for class.", dep);
@@ -181,7 +183,7 @@ abstract class AbstractInjector implements Injector{
 		Class<?>[] classes = tools.getConstructorTypes(c);
 
 		Object[] params = getDependencies(classes);
-		T instance =  tools.construct(c, params);
+		T instance =  tools.construct(c, classes, params);
 				
 		injectDependencies(instance);
 		return instance;
