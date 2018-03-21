@@ -26,6 +26,7 @@ class QualifiedInjector extends AbstractInjector {
 		return dependencies.containsKey(c) || root().hasDependency(c);
 	}
 	
+	// Convinience method to get the root injector
 	private Injector root(){
 		return InjectionManager.getRootInjector();
 	}
