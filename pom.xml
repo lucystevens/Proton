@@ -9,6 +9,7 @@
 
 	<properties>
 		<test>org.proton_di.test.suites.InjectionTestSuite</test>
+		<skip.sonatype.plugins>true</skip.sonatype.plugins>
 	</properties>
 
 	<name>${project.groupId}:${project.artifactId}</name>
@@ -63,6 +64,7 @@
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					<skipNexusStagingDeployMojo>${skip.sonatype.plugins}</skipNexusStagingDeployMojo>
 				</configuration>
 			</plugin>
 
@@ -87,6 +89,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<skipSource>${skip.sonatype.plugins}</skipSource>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -101,6 +106,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<skip>${skip.sonatype.plugins}</skip>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -116,6 +124,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+				<skip>${skip.sonatype.plugins}</skip>
+				</configuration>
 			</plugin>
 
 		</plugins>
