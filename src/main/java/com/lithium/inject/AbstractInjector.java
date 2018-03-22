@@ -173,7 +173,7 @@ abstract class AbstractInjector implements Injector{
 	@Override
 	public void injectDependencies(Object o){
 		Class<?> c = o.getClass();
-		tools.getAllInjectableFields(c).forEach((f) -> injectIntoField(f, o));
+		tools.getAllInjectableFields(c).forEach(f -> injectIntoField(f, o));
 	}
 	
 	@Override

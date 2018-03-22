@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.lithium</groupId>
 	<artifactId>Proton</artifactId>
-	<version>0.1.5-alpha</version>
+	<version>0.1.6-alpha</version>
 	
 	<properties>
     	<test>com.lithium.test.suites.InjectionTestSuite</test>

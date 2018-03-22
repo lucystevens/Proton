@@ -1,4 +1,4 @@
-# Proton (alpha) &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton) &emsp; ![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=sqale_rating) &emsp; ![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=bugs)
+# Proton (alpha) &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton) &emsp; [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=com.lithium%3AProton) &emsp; [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=bugs)](https://sonarcloud.io/dashboard?id=com.lithium%3AProton)
 
 Proton is a simple, lightweight dependency injection framework for Java.
 It has been designed to be used for smaller projects where all the complexities, features, and additional dependencies of the Spring Framework are not needed.
@@ -10,6 +10,18 @@ The project will be available from the maven central repository when it leaves t
 
 
 ## Documentation
+ - [Injection into objects](#injection-into-objects)
+ - [Static Injection](#static-injection)
+ - [Superclass injection](#superclass-injection)
+ - [Injector managed construction](#injector-managed-construction)
+ - [Manual injection](#manual-injection)
+ - [Defining dependencies](#defining-dependencies)
+ - [Defining third-party dependency configuration](#defining-third-party-dependency-configuration)
+ - [Retrieving dependencies](#retrieving-dependencies)
+ - [Dependencies within dependencies](#dependencies-within-dependencies)
+ - [Qualifying dependencies, classes, and injectors](#qualifying-dependencies-classes-and-injectors)
+ - [Specifying the default injector](#specifying-the-default-injector)
+ - [Classpath utilities](#classpath-utilities)
 
 Proton is currently in alpha and documentation will be updated as development continues.
 
@@ -42,7 +54,7 @@ The dependencies will be injected within the super constructor.
 #### Injector managed construction
 Objects with dependencies to be injected can be created using `Injector.newInstance(Class c)` where c is the class of the object to create.
 
-		Injector injector = Injector.getInstance();
+		Injector injector = InjectionManager.getInstance(InjectorManagedObject.class);
 		InjectorManagedObject imo = injector.newInstance(InjectorManagedObject.class);
 		
 If the object has a constructor marked with `@Inject`, this will be called and appropriate dependencies passed in as parameters. Otherwise the default constructor will be used.
@@ -52,7 +64,7 @@ In addition to this, any fields annotated with `@Inject` will be injected.
 If neither of the previous two methods are suitable for the situation, then the dependencies must be injected manually.
 This can be done by annotating the dependency fields with `@Inject` as shown above and passing the created object to the `Injector.injectDependencies(Object o)` method.
 
-		Injector injector = Injector.getInstance();
+		Injector injector = InjectionManager.getInstance(SomeObject.class);
 		SomeObject so = new SomeObject();
 		injector.injectDependencies(so);
 		
@@ -113,10 +125,46 @@ or through annotating fields with `@Inject` as shown above for objects.
 	
 Ensure that you don't have any circular dependencies when defining dependencies within dependencies!
 
+### Qualifying dependencies, classes, and injectors
+
+Proton contains the functionality to *qualify* dependencies and objects with fields to be injected so they are processed together by a specific Injector instance. This should be done by marking the class with the `@Qualifier` annotation and specifying the specific qualifying string e.g. `"test"`.
+
+For example, if you have two dependencies that implement some interface `DaoService`. Let's say `HibernateService` is your default implementation and so it should not be annotated with `@Qualifier` and `MockDaoService` is your test implementation, so we annotated it with `@Qualifier("test")`. You can retrieve the appropriate Injector for a dependency one of several ways;
+
+ - Calling `InjectionManager.getInjector(Class c)` will return the appropriate Injector for the passed class by looking at it's `@Qualifier` annotation.
+ - Calling `InjectionManager.getInjector(String qualifier)` will return the *specified* Injector (e.g. test).
+ - Calling `InjectionManager.getDefaultInjector()` will return the default injector for the current application instance (see below for details).
+ 
+If a dependency cannot be found within a qualified injector, it will always default to checking the root injector for an instance.
+ 
+You can also ensure that a specific dependency will be injected into an class by annotating that class with `@Qualifier` e.g.
+	
+	@Qualifier("test")
+	public class UserService {
+	
+		@Inject
+		private DaoService dao;
+	
+	}
+	
+Will ensure that the implementation of `DaoService` injected into `UserService` is the *test* implementation or `MockDaoService` in the above example.
+ 
+#### Specifying the default injector
+
+The default injector is used whenever a class does not have a `@Qualifier` annotation. It can be set via one of two ways;
+
+ - Setting the property `proton.injector.default` in the VM args to the string qualifier of the injector you want to use as default. This is the recommended method as it can be specified before `InjectionManager` is initialised.
+ - Calling `InjectionManager.setDefaultInjector(String qualifier)` this will set the default injector to the injector with the specified qualifier. It should be noted that since this initialises `InjectionManager` before setting the default Injector, static fields will not be affected.
+ 
+As with other qualified injectors, the default injector will default to checking the root injector if a dependency is not found.
+
+
 ### Classpath utilities
 
 The Proton Library also contains, in addition to the functionality above, a ClassPath class for retrieving classes that meet certain criteria including;
 - Classes within a specific package
 - Classes with a specific annotation
 - Classes that implement a specific interface
+
+You can retrieve the current ClassPath by calling `ClassPath.getInstance()`.
 		
