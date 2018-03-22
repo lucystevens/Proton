@@ -1,4 +1,4 @@
-# Proton (alpha) &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton) &emsp; [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=com.lithium%3AProton) &emsp; [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.lithium%3AProton&metric=bugs)](https://sonarcloud.io/dashboard?id=com.lithium%3AProton)
+# Proton DI &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton) &emsp; [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=org.proton_di%3AProton%3Adevelopment) &emsp; [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=bugs)](https://sonarcloud.io/dashboard?id=org.proton_di%3AProton%3Adevelopment)
 
 Proton is a simple, lightweight dependency injection framework for Java.
 It has been designed to be used for smaller projects where all the complexities, features, and additional dependencies of the Spring Framework are not needed.
@@ -23,7 +23,6 @@ The project will be available from the maven central repository when it leaves t
  - [Specifying the default injector](#specifying-the-default-injector)
  - [Classpath utilities](#classpath-utilities)
 
-Proton is currently in alpha and documentation will be updated as development continues.
 
 ### Injection into objects
 
