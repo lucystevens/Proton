@@ -41,7 +41,7 @@ public enum InstanceType {
 	
 	/**
 	 * Creates the supplier for a dependency. 
-	 * @param c The class to create the supplier for
+	 * @param dependency The class to create the supplier for
 	 * @return A lambda function that either creates a new instance
 	 * or returns the existing singleton instance when called.
 	 */

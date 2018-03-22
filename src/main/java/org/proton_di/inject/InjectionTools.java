@@ -58,24 +58,6 @@ public class InjectionTools {
 	}
 	
 	/**
-	 * Constructs an object, given the parameters to use.<br>
-	 * @param c The class to construct an instance of.
-	 * @param params The parameters to pass to the constructor.
-	 * @return A new instance of the object, constructed using the
-	 * supplied parameters.
-	 * @throws DependencyCreationException If there is
-	 * not constructor matching the supplied parameters.
-	 * @deprecated This does not take into account abstractions
-	 * such as superclasses or interfaces. Please use 
-	 * {@link #construct(Class, Class[], Object[])} instead
-	 */
-	@Deprecated
-	public <T> T construct(Class<T> c, Object[] params){
-		Class<?>[] classes = argsToClasses(params);
-		return construct(c, classes, params);
-	}
-	
-	/**
 	 * Constructs an object, given the classes to use to
 	 * select the appropriate constructor, and the parameters
 	 * to pass to it.
@@ -96,21 +78,6 @@ public class InjectionTools {
 		} catch(Exception e){
 			 throw new MissingConstructorException(c, classes);
 		}
-	}
-	
-	/**
-	 * Converts an array of arguments to an array of
-	 * their respective classes. Used for retrieving methods
-	 * and constructors with specific parameters from a class.
-	 * @param args An array of arguments to be passed to a method
-	 * @return An array of classes of the original arguments.
-	 */
-	private Class<?>[] argsToClasses(Object...args){
-		Class<?>[] classes = new Class<?>[args.length];
-		for(int i = 0; i<args.length; i++){
-			classes[i] = args[i].getClass();
-		}
-		return classes;
 	}
 
 	/**

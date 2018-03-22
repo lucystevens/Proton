@@ -19,11 +19,9 @@ public class ConfiguredDependencySupplier extends DependencySupplier {
 	Object configInstance;
 	
 	/**
-	 * Constructs a new ConfiguredDependencySupplier with
-	 * the method to be used to create instances of the dependency
-	 * and an instance of the configuration class.
-	 * @param method
-	 * @param configInstance
+	 * Constructs a new ConfiguredDependencySupplier
+	 * @param method The method to be used to create instances of the dependency
+	 * @param configInstance An instance of the configuration class
 	 */
 	public ConfiguredDependencySupplier(Method method, Object configInstance) {
 		super(method.getReturnType());

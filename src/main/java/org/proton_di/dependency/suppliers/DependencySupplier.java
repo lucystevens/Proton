@@ -111,11 +111,11 @@ public abstract class DependencySupplier {
 	}
 	
 	/**
-	 * Checks if all sub dependencies for a parent dependency
-	 * are loaded.
-	 * @param parent The parent dependency class
-	 * @return True if all sub dependencies to be injected
-	 * have suppliers in the dependency map. False if not.
+	 * Checks if all sub dependencies fro this supplier have been loaded
+	 * into an Injector
+	 * @param injector The Injector to check for the sub dependencies
+	 * @return True if all sub dependencies have been loaded into the
+	 * given injector.
 	 */
 	public boolean subDependenciesLoaded(Injector injector){	
 		for (Class<?> c : getSubDependencies()) {
@@ -126,11 +126,13 @@ public abstract class DependencySupplier {
 	
 	/**
 	 * Checks the queue of classes to load to ensure all
-	 * sub dependencies of the parent are valid and queued
+	 * sub dependencies of this supplier are valid and queued
 	 * to be loaded.
-	 * @param parent The parent dependency class
-	 * @throws DependencyCreationException If any of the required
-	 * sub dependencies have not been registered as dependencies.
+	 * @param toInit The List of suppliers yet to be initialised
+	 * @param injector The injector that will be used to initialise
+	 * the suppliers
+	 * @throws DependencyCreationException If there are sub dependencies missing
+	 * that have not been initialised, and are not in the list to initialise.
 	 */
 	public void validateSubDependencies(List<DependencySupplier> toInit, Injector injector){
 		StringBuilder missing = new StringBuilder("Missing dependencies : ");

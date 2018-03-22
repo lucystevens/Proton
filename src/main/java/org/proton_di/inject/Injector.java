@@ -50,6 +50,7 @@ public interface Injector {
 	public <T> T newInstance(Class<T> c);
 	
 	/**
+	 * @param c The dependency class to check for.
 	 * @return Whether this Injector has a dependency stored for this class.
 	 */
 	public boolean hasDependency(Class<?> c);

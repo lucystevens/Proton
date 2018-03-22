@@ -34,8 +34,8 @@ public class InjectionManager {
 	 * Used to load the Injection Manager class and initialise
 	 * the RootInjector singleton instance.<br>
 	 * 
-	 * Calling {@link InjectionManager#getInjector()} or 
-	 * <code>Class.forName("org.proton_di.inject.Injector")</code>
+	 * Calling any other methods in InjectionManager or 
+	 * <code>Class.forName("org.proton_di.inject.InjectionManager")</code>
 	 * will achieve the same results, but this method makes the
 	 * intention more obvious.
 	 */
@@ -59,12 +59,13 @@ public class InjectionManager {
 	 * @param c The class for which to retrieve the managing Injector.
 	 * @return <ul>
 	 * <li>If the class is not annotated with {@link Qualifier},
-	 * return the default injector
+	 * return the default injector</li>
 	 * <li>If the class is annotated, but a specific value has not
 	 * been set (the annotation value defaults to {@link #ROOT_QUALIFIER}),
-	 * return the root Injector.
+	 * return the root Injector.</li>
 	 * <li>Otherwise return the Injector corresponding to the value of
-	 * the <code>@Qualifier</code> annotation using {@link #getInjector(String)}.
+	 * the <code>@Qualifier</code> annotation using {@link #getInjector(String)}.</li>
+	 * </ul>
 	 */
 	public static Injector getInjector(Class<?> c){
 		Qualifier q = c.getAnnotation(Qualifier.class);
