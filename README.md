@@ -1,9 +1,30 @@
-# Proton DI &emsp; [![Build Status](https://travis-ci.org/lukecmstevens/Proton.svg?branch=master)](https://travis-ci.org/lukecmstevens/Proton) &emsp; [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=org.proton_di%3AProton%3Adevelopment) &emsp; [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=bugs)](https://sonarcloud.io/dashboard?id=org.proton_di%3AProton%3Adevelopment)
+[![Build Status][travis ci dev img]][travis ci] &emsp;&emsp;
+[![Maintainability][sonarcloud maintainability dev img]][sonarcloud dev] &emsp;&emsp;
+[![Bugs][sonarcloud bugs dev img]][sonarcloud dev] &emsp;&emsp;
+[![Maven][maven badge]][maven repo] &emsp;&emsp;
+
+# Proton DI 
 
 Proton is a simple, lightweight dependency injection framework for Java.
 It has been designed to be used for smaller projects where all the complexities, features, and additional dependencies of the Spring Framework are not needed.
 
 ## Including Proton in your project
+
+### Maven
+Add this to your pom.xml
+
+	<dependency>
+	    <groupId>org.proton-di</groupId>
+	    <artifactId>Proton</artifactId>
+	    <version>1.0.0-beta</version>
+	</dependency>
+	
+### Gradle
+Add this to build.gradle
+
+	dependencies {
+	    compile 'org.proton-di:Proton:1.0.0-beta'
+	}
 
 Currently to include Proton in your project you must clone the repository and import the project dependency manually.
 The project will be available from the maven central repository when it leaves the alpha stage of development
@@ -166,4 +187,21 @@ The Proton Library also contains, in addition to the functionality above, a Clas
 - Classes that implement a specific interface
 
 You can retrieve the current ClassPath by calling `ClassPath.getInstance()`.
+
+
+[travis ci master img]:https://travis-ci.org/lukecmstevens/Proton.svg?branch=master
+[travis ci dev img]:https://travis-ci.org/lukecmstevens/Proton.svg?branch=development
+[travis ci]:https://travis-ci.org/lukecmstevens/Proton
+
+[sonarcloud maintainability master img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton&metric=sqale_rating
+[sonarcloud maintainability dev img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=sqale_rating
+
+[sonarcloud bugs master img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton&metric=bugs
+[sonarcloud bugs dev img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=bugs
+
+[sonarcloud master]:https://sonarcloud.io/dashboard?id=org.proton_di%3AProton
+[sonarcloud dev]:https://sonarcloud.io/dashboard?id=org.proton_di%3AProton%3Adevelopment
+
+[maven repo]:https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22Proton%22
+[maven badge]:https://maven-badges.herokuapp.com/maven-central/org.proton-di/Proton/badge.svg
 		

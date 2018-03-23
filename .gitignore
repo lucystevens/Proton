@@ -27,3 +27,4 @@ target/**
 .project
 .classpath
 settings.xml
+.README.md.html
