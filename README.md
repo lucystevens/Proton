@@ -1,6 +1,6 @@
-[![Build Status][travis ci dev img]][travis ci] &emsp;&emsp;
-[![Maintainability][sonarcloud maintainability dev img]][sonarcloud dev] &emsp;&emsp;
-[![Bugs][sonarcloud bugs dev img]][sonarcloud dev] &emsp;&emsp;
+[![Build Status][travis ci master img]][travis ci] &emsp;&emsp;
+[![Maintainability][sonarcloud maintainability master img]][sonarcloud master] &emsp;&emsp;
+[![Bugs][sonarcloud bugs master img]][sonarcloud master] &emsp;&emsp;
 [![Maven][maven badge]][maven repo] &emsp;&emsp;
 
 # Proton DI 
@@ -193,14 +193,14 @@ You can retrieve the current ClassPath by calling `ClassPath.getInstance()`.
 [travis ci dev img]:https://travis-ci.org/lukecmstevens/Proton.svg?branch=development
 [travis ci]:https://travis-ci.org/lukecmstevens/Proton
 
-[sonarcloud maintainability master img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton&metric=sqale_rating
-[sonarcloud maintainability dev img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=sqale_rating
+[sonarcloud maintainability master img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton-di%3AProton&metric=sqale_rating
+[sonarcloud maintainability dev img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton-di%3AProton%3Adevelopment&metric=sqale_rating
 
-[sonarcloud bugs master img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton&metric=bugs
-[sonarcloud bugs dev img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton_di%3AProton%3Adevelopment&metric=bugs
+[sonarcloud bugs master img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton-di%3AProton&metric=bugs
+[sonarcloud bugs dev img]:https://sonarcloud.io/api/project_badges/measure?project=org.proton-di%3AProton%3Adevelopment&metric=bugs
 
-[sonarcloud master]:https://sonarcloud.io/dashboard?id=org.proton_di%3AProton
-[sonarcloud dev]:https://sonarcloud.io/dashboard?id=org.proton_di%3AProton%3Adevelopment
+[sonarcloud master]:https://sonarcloud.io/dashboard?id=org.proton-di%3AProton
+[sonarcloud dev]:https://sonarcloud.io/dashboard?id=org.proton-di%3AProton%3Adevelopment
 
 [maven repo]:https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22Proton%22
 [maven badge]:https://maven-badges.herokuapp.com/maven-central/org.proton-di/Proton/badge.svg
