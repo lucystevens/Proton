@@ -203,5 +203,5 @@ You can retrieve the current ClassPath by calling `ClassPath.getInstance()`.
 [sonarcloud dev]:https://sonarcloud.io/dashboard?id=org.proton-di%3AProton%3Adevelopment
 
 [maven repo]:https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22Proton%22
-[maven badge]:https://maven-badges.herokuapp.com/maven-central/org.proton-di/Proton/badge.svg
+[maven badge]:https://img.shields.io/badge/maven--central-v1.0.0--beta-blue.svg
 		
